@@ -58,17 +58,9 @@ class FSMTest extends \PHPUnit_Framework_TestCase
             ['root>{text}.class'],
             ['root>{text}#id'],
             ['root>{text}[attr]'],
-            // get multiplications errors
-            ['root>*32a'],
-            ['root>*2.class'],
-            ['root>*2#id'],
-            ['root>*2[attr]'],
-            ['root>*2{text}'],
         ];
 
     }
-//[$this->getProcessEmmet('root>[attr')],
-//[$this->getProcessEmmet('root>[attr]p')],
 
     public function emmetProvider()
     {
