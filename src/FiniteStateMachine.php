@@ -94,6 +94,7 @@ class FiniteStateMachine
         ),
         self::GET_MULTIPLICATION => array(
             'operator' => self::SET_OPERATOR,
+            '' => self::END,
         ),
         self::GET_TEXT_NODE => array(
             '}' => self::WAIT_AFTER_TEXT_NODE,
@@ -113,11 +114,14 @@ class FiniteStateMachine
     );
 
 
-    public function __construct($state)
+    public function __construct($state = null)
     {
 
+        if(null === $state){
+            $state = self::GET_TAG;
+        }
         if(!in_array($state, self::$_initial_states)){
-            $this->throwException('Undefined Initial State. Use the list of the initial states.');
+            throw new \InvalidArgumentException('Undefined Initial State. Use the list of the initial states.');
         } else {
             $this->_state = $state;
         }
@@ -183,7 +187,7 @@ class FiniteStateMachine
     private function throwException($message)
     {
 
-        echo $message;exit;
+        throw new \Exception($message);
 
     }
 
