@@ -10,11 +10,11 @@ namespace emmet;
 abstract class Node
 {
 
-    protected $_first_child = null;
-    protected $_right_sibling = null;
-    protected $_parent = null;
-    protected $_is_root = false;
-    protected $_multiplication = 1;
+    private $_first_child = null;
+    private $_right_sibling = null;
+    private $_parent = null;
+    private $_is_root = false;
+    private $_multiplication = 1;
 
     abstract function getHtml();
 
@@ -43,6 +43,7 @@ abstract class Node
         if(null !== $this->_right_sibling){
             return $this->_right_sibling->addSibling($sibling);
         }
+        $sibling->_parent = $this->_parent;
         $this->_right_sibling = $sibling;
         return true;
 
@@ -52,6 +53,19 @@ abstract class Node
     {
 
         return $this->_parent;
+
+    }
+
+    public function getFirstChild()
+    {
+
+        return $this->_first_child;
+
+    }
+    public function getRightSibling()
+    {
+
+        return $this->_right_sibling;
 
     }
     public function hasParent()
@@ -76,8 +90,11 @@ abstract class Node
     }
     public function setRoot()
     {
-
-        $this->_is_root = true;
+        if(!$this->hasParent()){
+            $this->_is_root = true;
+        } else {
+            throw new \Exception('You can not set to root element which has a parent element.');
+        }
 
     }
 
@@ -96,12 +113,19 @@ abstract class Node
 
     }
 
+    public function getMultiplication()
+    {
+
+        return $this->_multiplication;
+
+    }
+
 }
 
 class TextNode extends Node
 {
 
-    private $_value;
+    private $_value = '';
 
     public function setValue($value)
     {
@@ -120,10 +144,10 @@ class TextNode extends Node
     public function getHtml()
     {
 
-        if($this->_right_sibling){
-            return str_repeat($this->_value, $this->_multiplication) . $this->_right_sibling->getHtml();
+        if($this->getRightSibling()){
+            return str_repeat($this->_value, $this->getMultiplication()) . $this->getRightSibling()->getHtml();
         }
-        return str_repeat($this->_value, $this->_multiplication);
+        return str_repeat($this->_value, $this->getMultiplication());
 
     }
 
@@ -153,7 +177,7 @@ class Element extends Node
 
     }
 
-    public function addAttribute($attributes)
+    public function addAttributes($attributes)
     {
 
         $attributes = explode(' ', $attributes);
@@ -164,7 +188,7 @@ class Element extends Node
             }
             if('class' === $attr_values[0]){
                 if(isset($this->_attributes['class'])){
-                    $this->_attributes['class'] += ' '.$attr_values[1];
+                    $this->_attributes['class'] .= ' '.$attr_values[1];
                 } else {
                     $this->_attributes['class'] = $attr_values[1];
                 }
@@ -172,6 +196,13 @@ class Element extends Node
                 $this->_attributes[$attr_values[0]] = $attr_values[1];
             }
         }
+
+    }
+
+    public function getAttributes()
+    {
+
+        return $this->_attributes;
 
     }
 
@@ -188,8 +219,8 @@ class Element extends Node
     {
 
         if($this->isRoot()){
-            if($this->_first_child){
-                return $this->_first_child->getHtml();
+            if($this->getFirstChild()){
+                return $this->getFirstChild()->getHtml();
             } else {
                 return '';
             }
@@ -198,12 +229,12 @@ class Element extends Node
             return $this->selfClosingElement();
         } else {
             $value = '';
-            if($this->_first_child){
-                $value .= $this->_first_child->getHtml();
+            if($this->getFirstChild()){
+                $value .= $this->getFirstChild()->getHtml();
             }
             $html = $this->closingElement($value);
-            if($this->_right_sibling){
-                $html .= $this->_right_sibling->getHtml();
+            if($this->getRightSibling()){
+                $html .= $this->getRightSibling()->getHtml();
             }
             return $html;
         }
