@@ -65,7 +65,7 @@ class PolishNotation
 
     }
 
-    public function setOutput()
+    public function endOutput()
     {
 
         while(true){
@@ -85,7 +85,7 @@ class PolishNotation
 
     public function generateTree()
     {
-        $this->setOutput();
+        $this->endOutput();
         while(!empty($this->_output)){
             $el = array_shift($this->_output);
             if($el instanceof Node){
@@ -136,6 +136,20 @@ class PolishNotation
             $res = $res->getParent();
         }
         return $res;
+
+    }
+
+    protected function setOutput(array $output)
+    {
+
+        $this->_output = $output;
+
+    }
+
+    public function getOutput()
+    {
+
+        return $this->_output;
 
     }
 
