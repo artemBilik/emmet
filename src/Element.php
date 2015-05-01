@@ -2,6 +2,11 @@
 
 namespace emmet;
 
+
+/*
+ * @todo $ in multiplication
+ */
+
 abstract class Node
 {
 
@@ -9,6 +14,7 @@ abstract class Node
     protected $_right_sibling = null;
     protected $_parent = null;
     protected $_is_root = false;
+    protected $_multiplication = 1;
 
     abstract function getHtml();
 
@@ -82,6 +88,14 @@ abstract class Node
 
     }
 
+    public function setMultiplication($number)
+    {
+
+        $number = intval($number);
+        $this->_multiplication = ($number < 1) ? 1 : $number;
+
+    }
+
 }
 
 class TextNode extends Node
@@ -107,9 +121,9 @@ class TextNode extends Node
     {
 
         if($this->_right_sibling){
-            return $this->_value . $this->_right_sibling->getHtml();
+            return str_repeat($this->_value, $this->_multiplication) . $this->_right_sibling->getHtml();
         }
-        return $this->_value;
+        return str_repeat($this->_value, $this->_multiplication);
 
     }
 
@@ -160,9 +174,6 @@ class Element extends Node
         }
 
     }
-
-    public function getAttributes()
-    {}
 
     public function setValue($value)
     {
