@@ -35,6 +35,22 @@ class Emmet
             } else {
                 $symbol = $emmet_string[$i];
             }
+
+            if(' ' === $symbol){
+                ++$i;
+                continue;
+            }
+            if('/' === $symbol){
+                if($i === $length){
+                    $i++;
+                    continue;
+                } else {
+                    $value .= $emmet_string[++$i];
+                    ++$i;
+                    continue;
+                }
+            }
+
             if(FSM::ERROR === $fsm->getState()){
                 $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($emmet_string, $i));
             }
@@ -54,13 +70,13 @@ class Emmet
                         }
                         break;
                     case FSM::GET_ID:
-                        $element->addAttribute('id='.substr($value, 1));
+                        $element->addAttributes('id='.substr($value, 1));
                         break;
                     case FSM::GET_CLASS:
-                        $element->addAttribute('class='.substr($value, 1));
+                        $element->addAttributes('class='.substr($value, 1));
                         break;
                     case FSM::GET_ATTR:
-                        $element->addAttribute(substr($value, 1));
+                        $element->addAttributes(substr($value, 1));
                         break;
                     case FSM::GET_TEXT:
                         $element->setValue(substr($value,1));
@@ -106,7 +122,11 @@ class Emmet
     public function generate($data)
     {
 
-        return $this->_tree->getHtml();
+
+        return $this->_tree->getHtml(function($variable) use($data){
+            extract($data);
+            return eval('return $'.$variable . ';');
+        });
 
     }
 
