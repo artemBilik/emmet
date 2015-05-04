@@ -15,8 +15,9 @@ abstract class Node
     private $_parent = null;
     private $_is_root = false;
     private $_multiplication = 1;
+    protected $_number = 0;
 
-    abstract function getHtml();
+    abstract function getHtml(callable $getData);
 
     public function addTo(Node $parent)
     {
@@ -120,6 +121,47 @@ abstract class Node
 
     }
 
+    public function createValue($value, callable $getData)
+    {
+
+        $result = '';
+        $variable = '';
+        $get_var = false;
+
+        for($i = 0, $length = strlen($value); $i < $length; ++$i){
+            $symbol = $value{$i};
+            if('$' === $value{$i}){
+                $symbol = $this->_number;
+            }
+
+            if('`' === $symbol){
+                if(!$get_var){
+                    $get_var = true;
+                } else {
+                    $result .= $getData($variable);
+                    $variable = '';
+                    $get_var = false;
+                }
+            } else {
+                if($get_var){
+                    $variable .= $symbol;
+                } else {
+                    $result .= $symbol;
+                }
+            }
+        }
+
+        return $result;
+
+    }
+
+    public function setNumber($number)
+    {
+
+        $this->_number = intval($number);
+
+    }
+
 }
 
 class TextNode extends Node
@@ -134,20 +176,26 @@ class TextNode extends Node
 
     }
 
-    public function getValue()
+    public function getValue(callable $getData)
     {
 
-        return $this->_value;
+        return $this->createValue($this->_value, $getData);
 
     }
 
-    public function getHtml()
+    public function getHtml(callable $getData)
     {
 
-        if($this->getRightSibling()){
-            return str_repeat($this->_value, $this->getMultiplication()) . $this->getRightSibling()->getHtml();
+        $result = '';
+        for($i = 0; $i < $this->getMultiplication(); ++$i){
+            $this->setNumber($i);
+            $result .= $this->getValue($getData);
         }
-        return str_repeat($this->_value, $this->getMultiplication());
+        if($this->getRightSibling()){
+            return $result .= $this->getRightSibling()->getHtml($getData);
+        }
+
+        return $result;
 
     }
 
@@ -215,53 +263,60 @@ class Element extends Node
 
     }
 
-    public function getHtml()
+    public function getHtml(callable $getData)
     {
 
         if($this->isRoot()){
             if($this->getFirstChild()){
-                return $this->getFirstChild()->getHtml();
+                return $this->getFirstChild()->getHtml($getData);
             } else {
                 return '';
             }
         }
-        if(in_array($this->_tag, self::$_self_closing_tags)){
-            return $this->selfClosingElement();
-        } else {
-            $value = '';
-            if($this->getFirstChild()){
-                $value .= $this->getFirstChild()->getHtml();
+        $result = '';
+        for($i = 0; $i < $this->getMultiplication(); $i++){
+            $this->setNumber($i);
+            if(in_array($this->_tag, self::$_self_closing_tags)){
+                $result .= $this->selfClosingElement($getData);
+            } else {
+                $value = '';
+                if($this->getFirstChild()){
+                    $this->getFirstChild()->setNumber($this->_number);
+                    $value .= $this->getFirstChild()->getHtml($getData);
+                }
+                $html = $this->closingElement($value, $getData);
+                if($this->getRightSibling()){
+                    $html .= $this->getRightSibling()->getHtml($getData);
+                }
+                $result .= $html;
             }
-            $html = $this->closingElement($value);
-            if($this->getRightSibling()){
-                $html .= $this->getRightSibling()->getHtml();
-            }
-            return $html;
         }
+        return $result;
+
 
     }
 
-    private function closingElement($value)
+    private function closingElement($value, callable $getData)
     {
 
-        return "<" . $this->_tag . $this->createAttributesList() . ">" . $value . "</" . $this->_tag . ">";
+        return "<" . $this->createValue($this->_tag, $getData) . $this->createAttributesList($getData) . ">" . $value . "</" . $this->createValue($this->_tag, $getData) . ">";
 
 
     }
 
-    private function selfClosingElement()
+    private function selfClosingElement(callable $getData)
     {
 
-        return "<" . $this->_tag . $this->createAttributesList() . " />";
+        return "<" . $this->createValue($this->_tag, $getData) . $this->createAttributesList($getData) . " />";
 
     }
 
-    private function createAttributesList()
+    private function createAttributesList(callable $getData)
     {
 
         $attributes = '';
         foreach($this->_attributes as $attr => $value){
-            $attributes .= " " . mb_strtolower($attr) . "=\"" . $value . "\"";
+            $attributes .= " " . mb_strtolower($this->createValue($attr, $getData)) . "=\"" . $this->createValue($value, $getData) . "\"";
         }
         return $attributes;
 
