@@ -188,11 +188,13 @@ class TextNode extends Node
 
         $result = '';
         for($i = 0; $i < $this->getMultiplication(); ++$i){
-            $this->setNumber($i);
+            if(1 !== $this->getMultiplication()){
+                $this->setNumber($i);
+            }
             $result .= $this->getValue($getData);
         }
         if($this->getRightSibling()){
-            return $result .= $this->getRightSibling()->getHtml($getData);
+            return $result . $this->getRightSibling()->getHtml($getData);
         }
 
         return $result;
@@ -275,13 +277,15 @@ class Element extends Node
         }
         $result = '';
         for($i = 0; $i < $this->getMultiplication(); $i++){
-            $this->setNumber($i);
+            if(1 !== $this->getMultiplication()) {
+                $this->setNumber($i);
+            }
             if(in_array($this->_tag, self::$_self_closing_tags)){
                 $result .= $this->selfClosingElement($getData);
             } else {
                 $value = '';
                 if($this->getFirstChild()){
-                    $this->getFirstChild()->setNumber($this->_number);
+                    $this->getFirstChild()->setNumber($i);
                     $value .= $this->getFirstChild()->getHtml($getData);
                 }
                 $html = $this->closingElement($value, $getData);
