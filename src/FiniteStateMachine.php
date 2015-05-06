@@ -64,7 +64,7 @@ class FiniteStateMachine
             '`' => [self::HTML, self::VARIABLE],
             '%' => [self::HTML, self::FUNC],
             ' ' => self::SKIP,
-            ''  => self::ERROR,
+            ''  => self::END,
             ',' => self::ERROR,
         ],
         self::TAG => [
