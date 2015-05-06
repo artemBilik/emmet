@@ -36,10 +36,6 @@ class Emmet
                 $symbol = $emmet_string[$i];
             }
 
-            if(' ' === $symbol){
-                ++$i;
-                continue;
-            }
             if('/' === $symbol){
                 if($i === $length){
                     $i++;
