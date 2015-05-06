@@ -53,7 +53,6 @@ class FSMTest extends \PHPUnit_Framework_TestCase
             ['root>]'],
             ['root+}'],
             ['root+,'],
-            ['root+'],
             // get tag errors
             ['root+div('],
             ['root+div]'],
