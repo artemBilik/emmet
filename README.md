@@ -26,7 +26,7 @@ Emmet for php
   }
   
   // Because it's work like prepared Statement in PDO
-  // Emmet::__construct( string emmet_string ) prepare the html tree 
+  // Emmet::__construct( string emmet_string ) will prepare the html tree 
   // And Emmet::create(array data) will use this tree
   
 ````````````
