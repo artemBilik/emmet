@@ -5,9 +5,9 @@ Emmet for php
 Global Usage
 
 
-<code><?php 
-<code>
-  <code>(new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
+```````````
+
+  (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
   
   // OR
    
@@ -22,4 +22,4 @@ Global Usage
   foreach($data as $value){
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
   }
-?>`
+````````````
