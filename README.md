@@ -1,6 +1,12 @@
 # emmet
 Emmet for php
+# Interface
+````
 
+Emmet::__construct( string emmet_string )
+Emmet::create(array data)
+
+````
 
 # Global Usage
 
@@ -26,7 +32,7 @@ Emmet for php
   }
   
   // Because it's work like prepared Statement in PDO
-  // Emmet::__construct( string emmet_string ) will prepare the html tree 
-  // And Emmet::create(array data) will use this tree
+  // Emmet::__construct() will prepare the html tree 
+  // And Emmet::create() will use this tree
   
 ````````````
