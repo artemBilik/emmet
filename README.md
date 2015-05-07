@@ -6,7 +6,9 @@ Emmet for php
 
 
 ``````````
-
+  use \emmet\Emmet;
+  require_once PATH_TO_EMMET . '/Emmet.php';
+  
   (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
   
   // OR
