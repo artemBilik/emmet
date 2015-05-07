@@ -19,7 +19,7 @@ Emmet::create(array data)
 ```
    OR
 ```
-  $emmet = new Emmet('tr>td{\`value\`}');
+  $emmet = new Emmet('tr>td{`value`}');
   
   foreach($data as $value){
       echo $emmet->create([ 'value' => $value ]);
