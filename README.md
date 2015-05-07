@@ -36,3 +36,7 @@ Simple Usage
    <strong>Emmet::__construct()</strong> will prepare the html tree.<br />
    And <strong>Emmet::create()</strong> will use this tree.<br />
 
+Best practice to create a table html element is
+```
+echo (new Emmet('table#myTable>tbody>tr.myTr*`tr_cnt`>td.myTd{`data[@][$]`}'))->create([ 'data' => $data, 'tr_cnt' => count($data), 'td_cnt' => count($data[0])]);
+```
