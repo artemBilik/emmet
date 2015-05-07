@@ -22,4 +22,11 @@ Global Usage
   foreach($data as $value){
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
   }
+  
+  // Because it's work like prepared Statement in PDO
+  // Emmet::__construct( string emmet_string ) prepare the html tree 
+  // And Emmet::create(array data) will use this tree
+  
+  
+  
 ````````````
