@@ -32,6 +32,6 @@ Emmet::create(array data)
   }
 ```
    Because it's work like prepared Statement in PDO <br />
-   Emmet::__construct() will prepare the html tree <br />
-   And Emmet::create() will use this tree <br />
+   <strong>Emmet::__construct()</strong> will prepare the html tree <br />
+   And <strong>Emmet::create()</strong> will use this tree <br />
 
