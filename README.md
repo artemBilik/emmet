@@ -11,13 +11,12 @@ Emmet::create(array data)
 # Global Usage
 
 
+Simple Usage
 ``````````
-  use \emmet\Emmet;
-  require_once PATH_TO_EMMET . '/Emmet.php';
-  
   (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
 ```
    OR
+
 ```
   $emmet = new Emmet('tr>td{`value`}');
   
