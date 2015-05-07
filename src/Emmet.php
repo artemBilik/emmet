@@ -6,118 +6,47 @@ use emmet\FiniteStateMachine as FSM;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "Element.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "FiniteStateMachine.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "PolishNotation.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "Data.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "EmmetException.php";
 
-class Emmet
+class Emmet extends FiniteStateMachine
 {
 
     private $_tree = null;
     private $_emmet_string = '';
-    /*
-     * Create object's collection for generate html
-     */
-    public function build($emmet_string)
+    private $_data = null;
+
+    public function __construct($emmet_string)
     {
 
-        $this->_emmet_string = $emmet_string;
-        $emmet_string        = 'root>'.$emmet_string;
-
-        $fsm     = new FSM(FSM::GET_TAG);
-        $pn      = new PolishNotation();
-        $element = new Element();
-        $element->setRoot();
-        $value   = '';
-        $i       = 0;
-        $length = strlen($emmet_string) - 1;
-
-        while(FSM::END !== $fsm->getState()){
-            if($i > $length){
-                $symbol = '';
-            } else {
-                $symbol = $emmet_string[$i];
-            }
-
-            if('/' === $symbol){
-                if($i === $length){
-                    $i++;
-                    continue;
-                } else {
-                    $value .= $emmet_string[++$i];
-                    ++$i;
-                    continue;
-                }
-            }
-
-            if(FSM::ERROR === $fsm->getState()){
-                $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($emmet_string, $i));
-            }
-            $fsm->setState($symbol);
-            if($fsm->isStateChanged()){
-                switch($fsm->getPrevState()){
-                    case FSM::GET_TAG:
-                        $element->setTag($value);
-                        break;
-                    case FSM::SET_OPERATOR:
-                        if(!in_array($emmet_string[$i - 2], array('^', ')')) && '(' !== $value){
-                            $pn->setOperand($element);
-                            $element = new Element();
-                        }
-                        if(true !== ($pn_operator_status = $pn->setOperator($value))){
-                            $this->throwException($pn_operator_status.' '.$this->getCheckTheDocumentation($emmet_string, $i));
-                        }
-                        break;
-                    case FSM::GET_ID:
-                        $element->addAttributes('id='.substr($value, 1));
-                        break;
-                    case FSM::GET_CLASS:
-                        $element->addAttributes('class='.substr($value, 1));
-                        break;
-                    case FSM::GET_ATTR:
-                        $element->addAttributes(substr($value, 1));
-                        break;
-                    case FSM::GET_TEXT:
-                        $element->setValue(substr($value,1));
-                        break;
-                    case FSM::GET_MULTIPLICATION:
-                        $element->setMultiplication(substr($value,1));
-                        break;
-                    case FSM::GET_TEXT_NODE:
-                        $element = new TextNode();
-                        $element->setValue(substr($value,1));
-                        break;
-                    case FSM::WAIT_AFTER_ATTR:
-                        break;
-                    case FSM::WAIT_AFTER_TEXT_NODE:
-                        break;
-                    case FSM::WAIT_AFTER_TEXT:
-                        break;
-                    default:
-                        $this->throwException('Unhandled Finite State Machine State. '.$this->getCheckTheDocumentation($emmet_string, $i));
-                        break;
-                }
-                if(FSM::END === $fsm->getState() && FSM::SET_OPERATOR !== $fsm->getPrevState()){
-                    $pn->setOperand($element);
-                }
-                $value = $symbol;
-            } else {
-                $value .= $symbol;
-            }
-            ++$i;
-        }
-
-        $tree = $pn->generateTree();
-        if($tree instanceof Node){
-            $this->_tree = $tree;
+        if(is_string($emmet_string)) {
+            $this->_emmet_string = (string)$emmet_string;
         } else {
-            $this->throwException($tree);
+            $this->throwException('Emmet::__construct(string emmet_string). emmet_string is not a string.');
         }
+        $this->_data = new Data();
+        $this->build();
 
     }
+
     /*
-     * Create html by object's collection
+     * Parse emmet string;
+     * create an element tree;
      */
-    public function generate($data)
+    private function build()
     {
 
+        $element = new Element();
+        $element->setRoot();
+        $this->_tree = $element;
+
+    }
+
+    /*
+     * Create an html string
+     */
+    public function create($data = [])
+    {
 
         return $this->_tree->getHtml(function($variable) use($data){
             extract($data);
@@ -126,21 +55,10 @@ class Emmet
 
     }
 
-    /*
-     * Create an html string
-     */
-    public function create($emmet_string, $data = array())
+    private function getCheckTheDocumentation($i)
     {
 
-        $this->build($emmet_string);
-        return $this->generate($data);
-
-    }
-
-    private function getCheckTheDocumentation($emmet_string, $i)
-    {
-
-        return  'Check the documentation for the right syntax to use near "' . substr($emmet_string, 5, $i - 5) . '<strong style="color:red;">' . substr($emmet_string, $i) . '</strong>".';
+        return  'Check the documentation for the right syntax to use near "' . htmlspecialchars(substr($this->_emmet_string, 0, $i)) . '<strong style="color:red;">' . htmlspecialchars(substr($this->_emmet_string, $i)) . '</strong>".';
 
     }
 
@@ -151,11 +69,113 @@ class Emmet
 
     }
 
-    public function throwException($message)
+    private function throwException($message)
     {
 
-        echo $message; exit;
+        throw new EmmetException($message);
 
     }
 
 }
+
+
+
+
+
+
+//private function build()
+//{
+//
+//    $emmet_string        = 'root>'.$this->_emmet_string;
+//
+//    $fsm     = new FSM(FSM::GET_TAG);
+//    $pn      = new PolishNotation();
+//    $element = new Element();
+//    $element->setRoot();
+//    $value   = '';
+//    $i       = 0;
+//    $length = strlen($emmet_string) - 1;
+//
+//    while(FSM::END !== $fsm->getState()){
+//        if($i > $length){
+//            $symbol = '';
+//        } else {
+//            $symbol = $emmet_string[$i];
+//        }
+//
+//        if('/' === $symbol){
+//            if($i === $length){
+//                $i++;
+//                continue;
+//            } else {
+//                $value .= $emmet_string[++$i];
+//                ++$i;
+//                continue;
+//            }
+//        }
+//
+//        if(FSM::ERROR === $fsm->getState()){
+//            $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($emmet_string, $i));
+//        }
+//        $fsm->setState($symbol);
+//        if($fsm->isStateChanged()){
+//            switch($fsm->getPrevState()){
+//                case FSM::GET_TAG:
+//                    $element->setTag($value);
+//                    break;
+//                case FSM::SET_OPERATOR:
+//                    if(!in_array($emmet_string[$i - 2], array('^', ')')) && '(' !== $value){
+//                        $pn->setOperand($element);
+//                        $element = new Element();
+//                    }
+//                    if(true !== ($pn_operator_status = $pn->setOperator($value))){
+//                        $this->throwException($pn_operator_status.' '.$this->getCheckTheDocumentation($emmet_string, $i));
+//                    }
+//                    break;
+//                case FSM::GET_ID:
+//                    $element->addAttributes('id='.substr($value, 1));
+//                    break;
+//                case FSM::GET_CLASS:
+//                    $element->addAttributes('class='.substr($value, 1));
+//                    break;
+//                case FSM::GET_ATTR:
+//                    $element->addAttributes(substr($value, 1));
+//                    break;
+//                case FSM::GET_TEXT:
+//                    $element->setValue(substr($value,1));
+//                    break;
+//                case FSM::GET_MULTIPLICATION:
+//                    $element->setMultiplication(substr($value,1));
+//                    break;
+//                case FSM::GET_TEXT_NODE:
+//                    $element = new TextNode();
+//                    $element->setValue(substr($value,1));
+//                    break;
+//                case FSM::WAIT_AFTER_ATTR:
+//                    break;
+//                case FSM::WAIT_AFTER_TEXT_NODE:
+//                    break;
+//                case FSM::WAIT_AFTER_TEXT:
+//                    break;
+//                default:
+//                    $this->throwException('Unhandled Finite State Machine State. '.$this->getCheckTheDocumentation($emmet_string, $i));
+//                    break;
+//            }
+//            if(FSM::END === $fsm->getState() && FSM::SET_OPERATOR !== $fsm->getPrevState()){
+//                $pn->setOperand($element);
+//            }
+//            $value = $symbol;
+//        } else {
+//            $value .= $symbol;
+//        }
+//        ++$i;
+//    }
+//
+//    $tree = $pn->generateTree();
+//    if($tree instanceof Node){
+//        $this->_tree = $tree;
+//    } else {
+//        $this->throwException($tree);
+//    }
+//
+//}
