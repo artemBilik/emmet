@@ -425,7 +425,7 @@ class FiniteStateMachine
             $state = self::TAG;
         }
         if(!in_array($state, self::$_initial_states)){
-            throw new \InvalidArgumentException('Undefined Initial State. Use the list of the initial states.');
+            $this->throwException('FiniteStateMachine::__construct(int state = null). Undefined Initial State. Use the list of the initial states.');
         } else {
             $this->_state = $state;
         }
@@ -505,7 +505,7 @@ class FiniteStateMachine
     private function throwException($message)
     {
 
-        throw new \Exception($message);
+        throw new \EmmetException($message);
 
     }
 
