@@ -5,9 +5,9 @@ Emmet for php
 Global Usage
 
 
-`<?php 
-
-  (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
+<code><?php 
+<code>
+  <code>(new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
   
   // OR
    
