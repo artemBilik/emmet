@@ -31,7 +31,7 @@ Emmet::create(array data)
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
   }
 ```
-   Because it's work like prepared Statement in PDO
-   Emmet::__construct() will prepare the html tree
-   And Emmet::create() will use this tree
+   Because it's work like prepared Statement in PDO <br />
+   Emmet::__construct() will prepare the html tree <br />
+   And Emmet::create() will use this tree <br />
 
