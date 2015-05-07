@@ -17,7 +17,7 @@ Emmet::create(array data)
   
   (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
 ````  
-  // OR
+   OR
 ```   
   $emmet = new Emmet('tr>td{\`value\`}');
   
@@ -25,14 +25,15 @@ Emmet::create(array data)
       echo $emmet->create([ 'value' => $value ]);
   }
 ```  
-  //  Don't use Emmet in way like
+    Don't use Emmet in way like
   ```
   foreach($data as $value){
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
   }
   ```
-  // Because it's work like prepared Statement in PDO
-  // Emmet::__construct() will prepare the html tree 
-  // And Emmet::create() will use this tree
+   Because it's work like prepared Statement in PDO
+  
+   Emmet::__construct() will prepare the html tree 
+    And Emmet::create() will use this tree
   
 ````````````
