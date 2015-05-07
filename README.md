@@ -26,8 +26,8 @@ Emmet::create(array data)
   }
 ```
 
-    Don't use Emmet in way like
-    
+ Don't use Emmet in way like
+  
 ```
   foreach($data as $value){
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
