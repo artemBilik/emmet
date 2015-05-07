@@ -39,10 +39,9 @@ Simple Usage
 Best practice to create a table html element is
 ```
 echo (new Emmet(
-          'table#myTable>tbody>tr.myTr*`tr_cnt`>td.myTd{`data[@][$]`*`td_cnt`}'
+          'table#myTable>tbody>tr.myTr*`tr_cnt`>td.title{`data[$][title]`}+td{`data[$][value]`}'
   ))->create([ 
           'data' => $data, 
           'tr_cnt' => count($data), 
-          'td_cnt' => count($data[0]
   )]);
 ```
