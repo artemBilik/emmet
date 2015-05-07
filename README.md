@@ -5,7 +5,7 @@ Emmet for php
 Global Usage
 
 
-<?php 
+<code><?php 
 
   (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
   
@@ -22,4 +22,4 @@ Global Usage
   foreach($data as $value){
       echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
   }
-?>
+?></code>
