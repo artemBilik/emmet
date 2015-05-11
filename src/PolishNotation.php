@@ -8,6 +8,11 @@ class PolishNotation
     private $_output = array();
     private $_stack  = array();
 
+    /**
+     * @param char $operator
+     * @return bool
+     * @throws \Exception
+     */
     public function setOperator($operator)
     {
 
@@ -27,7 +32,7 @@ class PolishNotation
                         $up++;
                     }
                     if(null === $operator){
-                        return 'Incorrectly placed brackets.';
+                        $this->throwException('Incorrectly placed brackets.');
                     }
                 } while('(' !== $operator);
                 while($up > 0){
@@ -45,27 +50,31 @@ class PolishNotation
                 do{
                     $operator = array_shift($this->_stack);
                     if(empty($this->_stack)){
-                        return 'The "^" operator is excess.';
+                        $this->throwException('The "^" operator is excess.');
                     }
                     $this->_output[] = $operator;
                 } while('>' !== $operator);
                 $this->_output[] = '^';
                 return true;
             default:
-                return 'Undefined operator "' . $operator . '".';
+                $this->throwException('Undefined operator "' . $operator . '".');
         }
 
-
     }
-
+    /**
+     * @param Node $operand
+     */
     public function setOperand(Node $operand)
     {
 
         $this->_output[] = $operand;
 
     }
-
-    public function endOutput()
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    private function endOutput()
     {
 
         while(true){
@@ -73,16 +82,19 @@ class PolishNotation
             if(null === $operator){
                 break;
             } elseif('(' === $operator){
-                return 'Incorrectly placed brackets.';
+                $this->throwException('Incorrectly placed brackets.');
             } else {
                 $this->_output[] = $operator;
             }
         }
 
-        return true;
+        return $this->_output;
 
     }
-
+    /**
+     * @return Node
+     * @throws \Exception
+     */
     public function generateTree()
     {
         $this->endOutput();
@@ -98,7 +110,7 @@ class PolishNotation
                         $child->addTo($parent);
                         array_unshift($this->_stack, $parent);
                     } else {
-                        return 'the number of operands less than operations.';
+                        $this->throwException('the number of operands less than operations.');
                     }
                 } elseif('+' === $el){
                     $right = array_shift($this->_stack);
@@ -107,7 +119,7 @@ class PolishNotation
                         $left->addSibling($right);
                         array_unshift($this->_stack, $left);
                     } else {
-                        return 'the number of operands less than operations.';
+                        $this->throwException('the number of operands less than operations.');
                     }
                 } elseif('^' === $el){
                     $child = array_shift($this->_stack);
@@ -119,14 +131,14 @@ class PolishNotation
                             if(!$child->isRoot()){
                                 array_unshift($this->_stack, $child);
                             } else {
-                                return 'You are out of the tree. Check "^" operator.';
+                                $this->throwException('You are out of the tree. Check "^" operator.');
                             }
                         }
                     } else {
-                        return 'the number of operands less than operations.';
+                        $this->throwException('the number of operands less than operations.');
                     }
                 } else {
-                    return 'Undefined Operation. "'.$el.'".';
+                    $this->throwException('Undefined Operation. "'.$el.'".');
                 }
             }
         }
@@ -138,19 +150,34 @@ class PolishNotation
         return $res;
 
     }
-
+    /**
+     * @param array $output
+     */
     protected function setOutput(array $output)
     {
 
         $this->_output = $output;
 
     }
-
+    /**
+     * @return array
+     */
     public function getOutput()
     {
 
-        return $this->_output;
+        return $this->endOutput();
 
     }
+    /**
+     * @param string $message
+     * @throws \Exception
+     */
+    private function throwException($message)
+    {
+
+        throw new \Exception($message);
+
+    }
+
 
 }
