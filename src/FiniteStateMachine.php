@@ -6,39 +6,80 @@ class FiniteStateMachine
 {
 
     // FSM STATES
-    const OPERATOR        = 1;
-    const TAG             = 2;
-    const ID              = 3;
-    const CLASS_NAME      = 4;
-    const ATTR            = 5;
-    const AFTER_ATTR      = 6;
-    const TEXT            = 7;
-    const AFTER_TEXT      = 8;
-    const TEXT_NODE       = 9;
-    const AFTER_TEXT_NODE = 10;
-    const MULTI           = 11;
-    const VARIABLE        = 12;
-    const FUNC            = 13;
-    const ARGS            = 14;
-    const ARG_TXT         = 15;
-    const ARG_VAR         = 16;
-    const ERROR           = 17;
-    const END             = 18;
-    const HTML            = 22;
+    const OPERATOR        = 0;
 
-    const SAME = 19;
-    const PREV = 20;
-    const SKIP = 21;
+    const TAG         = 10;
+    const TAG_VAR     = 11;
+    const TAG_FUNC    = 12;
+    const TAG_ARGS    = 13;
+    const TAG_ARG_TXT = 14;
+    const TAG_ARG_VAR = 15;
+
+    const ID         = 20;
+    const ID_VAR     = 21;
+    const ID_FUNC    = 22;
+    const ID_ARGS    = 23;
+    const ID_ARG_TXT = 24;
+    const ID_ARG_VAR = 25;
+
+    const CLASS_NAME         = 30;
+    const CLASS_NAME_VAR     = 31;
+    const CLASS_NAME_FUNC    = 32;
+    const CLASS_NAME_ARGS    = 33;
+    const CLASS_NAME_ARG_TXT = 34;
+    const CLASS_NAME_ARG_VAR = 35;
+    
+    const ATTR         = 40;
+    const ATTR_VAR     = 41;
+    const ATTR_FUNC    = 42;
+    const ATTR_ARGS    = 43;
+    const ATTR_ARG_TXT = 44;
+    const ATTR_ARG_VAR = 45;
+    const AFTER_ATTR   = 46;
+    
+    const TEXT         = 50;
+    const TEXT_VAR     = 51;
+    const TEXT_FUNC    = 52;
+    const TEXT_ARGS    = 53;
+    const TEXT_ARG_TXT = 54;
+    const TEXT_ARG_VAR = 55;
+    const AFTER_TEXT   = 56;
+    
+    const TEXT_NODE         = 60;
+    const TEXT_NODE_VAR     = 61;
+    const TEXT_NODE_FUNC    = 62;
+    const TEXT_NODE_ARGS    = 63;
+    const TEXT_NODE_ARG_TXT = 64;
+    const TEXT_NODE_ARG_VAR = 65;
+    const AFTER_TEXT_NODE   = 66;
+    
+    const MULTI         = 70;
+    const MULTI_VAR     = 71;
+    const MULTI_FUNC    = 72;
+    const MULTI_ARGS    = 73;
+    const MULTI_ARG_TXT = 74;
+    const MULTI_ARG_VAR = 75;
+
+    const HTML         = 80;
+    const HTML_VAR     = 81;
+    const HTML_FUNC    = 82;
+    const HTML_ARGS    = 83;
+    const HTML_ARG_TXT = 84;
+    const HTML_ARG_VAR = 85;
+    
+    const ERROR = 90;
+    const END   = 91;
+    const SAME  = 92;
+    const PREV  = 93;
+    const SKIP  = 94;
 
 
     private $_state = null;
     private $_is_state_changed = false;
     private $_prev_state = null;
-    public $_global_state = null;
 
     private static $_states = [
-        self::OPERATOR, self::TAG, self::ID, self::CLASS_NAME, self::ATTR, self::AFTER_ATTR, self::TEXT, self::AFTER_TEXT, self::TEXT_NODE, self::AFTER_TEXT_NODE,
-        self::MULTI, self::VARIABLE, self::FUNC, self::ARGS, self::ARG_TXT, self::ARG_VAR, self::ERROR, self::END,
+
     ];
     private static $_initial_states = [
         self::TAG,
@@ -61,12 +102,13 @@ class FiniteStateMachine
             '{' => self::TEXT_NODE,
             '}' => self::ERROR,
             '*' => self::MULTI,
-            '`' => [self::HTML, self::VARIABLE],
-            '%' => [self::HTML, self::FUNC],
+            '`' => self::HTML_VAR,
+            '%' => self::HTML_FUNC,
             ' ' => self::SKIP,
             ''  => self::END,
             ',' => self::ERROR,
         ],
+// MAP FOR TAG
         self::TAG => [
             '+' => self::OPERATOR,
             '>' => self::OPERATOR,
@@ -81,12 +123,114 @@ class FiniteStateMachine
             '{' => self::TEXT,
             '}' => self::ERROR,
             '*' => self::MULTI,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::TAG_VAR,
+            '%' => self::TAG_FUNC,
             ' ' => self::SKIP,
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        self::TAG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TAG,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TAG_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::TAG_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::TAG,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TAG_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TAG_FUNC,
+            'a' => self::TAG_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::TAG_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::TAG_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TAG_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::TAG_ARGS,
+        ],
+        self::TAG_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TAG_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        
+// MAP FOR ID
         self::ID => [
             '+' => self::OPERATOR,
             '>' => self::OPERATOR,
@@ -101,12 +245,114 @@ class FiniteStateMachine
             '{' => self::TEXT,
             '}' => self::ERROR,
             '*' => self::MULTI,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::ID_VAR,
+            '%' => self::ID_FUNC,
             ' ' => self::SKIP,
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        self::ID_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::ID,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::ID_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ID_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ID,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::ID_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ID_FUNC,
+            'a' => self::ID_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ID_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::ID_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ID_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::ID_ARGS,
+        ],
+        self::ID_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::ID_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+   // MAP FOR CLASS NAME     
+        
         self::CLASS_NAME => [
             '+' => self::OPERATOR,
             '>' => self::OPERATOR,
@@ -121,12 +367,114 @@ class FiniteStateMachine
             '{' => self::TEXT,
             '}' => self::ERROR,
             '*' => self::MULTI,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::CLASS_NAME_VAR,
+            '%' => self::CLASS_NAME_FUNC,
             ' ' => self::SAME,
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        self::CLASS_NAME_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::CLASS_NAME,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::CLASS_NAME_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::CLASS_NAME_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::CLASS_NAME,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::CLASS_NAME_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::CLASS_NAME_FUNC,
+            'a' => self::CLASS_NAME_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::CLASS_NAME_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::CLASS_NAME_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::CLASS_NAME_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::CLASS_NAME_ARGS,
+        ],
+        self::CLASS_NAME_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::CLASS_NAME_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        
+        // MAP FOR ATTR
         self::ATTR => [
             '+' => self::SAME,
             '>' => self::SAME,
@@ -141,11 +489,111 @@ class FiniteStateMachine
             '{' => self::SAME,
             '}' => self::SAME,
             '*' => self::SAME,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::ATTR_VAR,
+            '%' => self::ATTR_FUNC,
             ' ' => self::SAME,
             ''  => self::ERROR,
             ',' => self::SAME,
+        ],
+        self::ATTR_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::ATTR,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::ATTR_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ATTR_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ATTR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::ATTR_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ATTR_FUNC,
+            'a' => self::ATTR_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ATTR_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::ATTR_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ATTR_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::ATTR_ARGS,
+        ],
+        self::ATTR_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::ATTR_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
         ],
         self::AFTER_ATTR => [
             '+' => self::OPERATOR,
@@ -167,6 +615,8 @@ class FiniteStateMachine
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        
+        // MAP FRO TEXT
         self::TEXT => [
             '+' => self::SAME,
             '>' => self::SAME,
@@ -181,11 +631,111 @@ class FiniteStateMachine
             '{' => self::ERROR,
             '}' => self::AFTER_TEXT,
             '*' => self::SAME,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::TEXT_VAR,
+            '%' => self::TEXT_FUNC,
             ' ' => self::SAME,
             ''  => self::ERROR,
             ',' => self::SAME,
+        ],
+        self::TEXT_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TEXT,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TEXT_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::TEXT_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::TEXT,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TEXT_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TEXT_FUNC,
+            'a' => self::TEXT_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::TEXT_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::TEXT_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TEXT_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::TEXT_ARGS,
+        ],
+        self::TEXT_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TEXT_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
         ],
         self::AFTER_TEXT => [
             '+' => self::OPERATOR,
@@ -221,11 +771,111 @@ class FiniteStateMachine
             '{' => self::ERROR,
             '}' => self::AFTER_TEXT_NODE,
             '*' => self::SAME,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::TEXT_NODE_VAR,
+            '%' => self::TEXT_NODE_FUNC,
             ' ' => self::SAME,
             ''  => self::ERROR,
             ',' => self::SAME,
+        ],
+        self::TEXT_NODE_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TEXT_NODE,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TEXT_NODE_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::TEXT_NODE_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::TEXT_NODE,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::TEXT_NODE_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TEXT_NODE_FUNC,
+            'a' => self::TEXT_NODE_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::TEXT_NODE_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::TEXT_NODE_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::TEXT_NODE_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::TEXT_NODE_ARGS,
+        ],
+        self::TEXT_NODE_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::TEXT_NODE_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
         ],
         self::AFTER_TEXT_NODE => [
             '+' => self::OPERATOR,
@@ -247,6 +897,8 @@ class FiniteStateMachine
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        
+        // MAP FOR MULTI
         self::MULTI => [
             '+' => self::OPERATOR,
             '>' => self::OPERATOR,
@@ -261,37 +913,37 @@ class FiniteStateMachine
             '{' => self::ERROR,
             '}' => self::ERROR,
             '*' => self::ERROR,
-            '`' => self::VARIABLE,
-            '%' => self::FUNC,
+            '`' => self::MULTI_VAR,
+            '%' => self::MULTI_FUNC,
             ' ' => self::SAME,
             ''  => self::END,
             ',' => self::ERROR,
         ],
-        self::VARIABLE => [
+        self::MULTI_VAR => [
             '+' => self::ERROR,
-            '>' => self::SAME,
+            '>' => self::ERROR,
             '^' => self::ERROR,
             '(' => self::ERROR,
             ')' => self::ERROR,
             'a' => self::SAME,
             '#' => self::ERROR,
-            '.' => self::ERROR,
+            '.' => self::SAME,
             '[' => self::SAME,
             ']' => self::SAME,
             '{' => self::SAME,
             '}' => self::SAME,
             '*' => self::ERROR,
-            '`' => self::PREV,
+            '`' => self::MULTI,
             '%' => self::ERROR,
             ' ' => self::ERROR,
             ''  => self::ERROR,
             ',' => self::ERROR,
         ],
-        self::FUNC => [
+        self::MULTI_FUNC => [
             '+' => self::ERROR,
             '>' => self::ERROR,
             '^' => self::ERROR,
-            '(' => self::ARGS,
+            '(' => self::MULTI_ARGS,
             ')' => self::ERROR,
             'a' => self::SAME,
             '#' => self::ERROR,
@@ -302,18 +954,18 @@ class FiniteStateMachine
             '}' => self::ERROR,
             '*' => self::ERROR,
             '`' => self::ERROR,
-            '%' => self::PREV,
+            '%' => self::MULTI,
             ' ' => self::SKIP,
             ''  => self::ERROR,
             ',' => self::ERROR,
         ],
-        self::ARGS => [
+        self::MULTI_ARGS => [
             '+' => self::ERROR,
             '>' => self::ERROR,
             '^' => self::ERROR,
             '(' => self::ERROR,
-            ')' => self::FUNC,
-            'a' => self::ARG_TXT,
+            ')' => self::MULTI_FUNC,
+            'a' => self::MULTI_ARG_TXT,
             '#' => self::ERROR,
             '.' => self::ERROR,
             '[' => self::ERROR,
@@ -321,18 +973,18 @@ class FiniteStateMachine
             '{' => self::ERROR,
             '}' => self::ERROR,
             '*' => self::ERROR,
-            '`' => self::ARG_VAR,
+            '`' => self::MULTI_ARG_VAR,
             '%' => self::ERROR,
             ' ' => self::SKIP,
             ''  => self::ERROR,
             ',' => self::SKIP,
         ],
-        self::ARG_TXT => [
+        self::MULTI_ARG_TXT => [
             '+' => self::ERROR,
             '>' => self::ERROR,
             '^' => self::ERROR,
             '(' => self::ERROR,
-            ')' => self::FUNC,
+            ')' => self::MULTI_FUNC,
             'a' => self::SAME,
             '#' => self::ERROR,
             '.' => self::ERROR,
@@ -345,9 +997,9 @@ class FiniteStateMachine
             '%' => self::ERROR,
             ' ' => self::SAME,
             ''  => self::ERROR,
-            ',' => self::ARGS,
+            ',' => self::MULTI_ARGS,
         ],
-        self::ARG_VAR => [
+        self::MULTI_ARG_VAR => [
             '+' => self::ERROR,
             '>' => self::ERROR,
             '^' => self::ERROR,
@@ -355,18 +1007,19 @@ class FiniteStateMachine
             ')' => self::ERROR,
             'a' => self::SAME,
             '#' => self::ERROR,
-            '.' => self::ERROR,
+            '.' => self::SAME,
             '[' => self::SAME,
             ']' => self::SAME,
             '{' => self::SAME,
             '}' => self::SAME,
             '*' => self::ERROR,
-            '`' => self::ARGS,
+            '`' => self::MULTI_ARGS,
             '%' => self::ERROR,
             ' ' => self::ERROR,
             ''  => self::ERROR,
             ',' => self::ERROR,
         ],
+        
         self::ERROR => [],
         self::END => [
             '+' => self::ERROR,
@@ -408,13 +1061,110 @@ class FiniteStateMachine
             ''  => self::END,
             ',' => self::ERROR,
         ],
+        self::HTML_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::HTML,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::HTML_FUNC => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::HTML_ARGS,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::HTML,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        self::HTML_ARGS => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::HTML_FUNC,
+            'a' => self::HTML_ARG_TXT,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::HTML_ARG_VAR,
+            '%' => self::ERROR,
+            ' ' => self::SKIP,
+            ''  => self::ERROR,
+            ',' => self::SKIP,
+        ],
+        self::HTML_ARG_TXT => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::HTML_FUNC,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::ERROR,
+            '[' => self::ERROR,
+            ']' => self::ERROR,
+            '{' => self::ERROR,
+            '}' => self::ERROR,
+            '*' => self::ERROR,
+            '`' => self::ERROR,
+            '%' => self::ERROR,
+            ' ' => self::SAME,
+            ''  => self::ERROR,
+            ',' => self::HTML_ARGS,
+        ],
+        self::HTML_ARG_VAR => [
+            '+' => self::ERROR,
+            '>' => self::ERROR,
+            '^' => self::ERROR,
+            '(' => self::ERROR,
+            ')' => self::ERROR,
+            'a' => self::SAME,
+            '#' => self::ERROR,
+            '.' => self::SAME,
+            '[' => self::SAME,
+            ']' => self::SAME,
+            '{' => self::SAME,
+            '}' => self::SAME,
+            '*' => self::ERROR,
+            '`' => self::HTML_ARGS,
+            '%' => self::ERROR,
+            ' ' => self::ERROR,
+            ''  => self::ERROR,
+            ',' => self::ERROR,
+        ],
+        
     ];
     private static $_alphabet = [
         '+', '>', '^', '(', ')', 'a', '#', '.', '[', ']', '{', '}', '*', '`', '%', ' ', '', ','
-    ];
-
-    private static $_global_states = [
-        self::TAG, self::ID, self::CLASS_NAME, self::ATTR, self::TEXT, self::TEXT_NODE, self::MULTI,
     ];
 
     /**
@@ -467,23 +1217,16 @@ class FiniteStateMachine
 
         $this->_is_state_changed = false;
 
-        if(is_array($state)){
-            $this->setNewState($state[1]);
-            $this->_global_state = $state[0];
-        } else {
-            switch($state){
-                case self::SAME:
-                    break;
-                case self::SKIP:
-                    break;
-                case self::PREV:
-                    $this->setNewState($this->_global_state);
-                    break;
-                default:
-                    $this->setNewState($state);
-                    break;
-            }
+        switch($state){
+            case self::SAME:
+                break;
+            case self::SKIP:
+                break;
+            default:
+                $this->setNewState($state);
+                break;
         }
+
         return true;
     }
 
@@ -496,10 +1239,6 @@ class FiniteStateMachine
         $this->_prev_state       = $this->_state;
         $this->_is_state_changed = (self::SKIP === $state) ? false : true;
         $this->_state            = $state;
-
-        if(in_array($state, self::$_global_states)){
-            $this->_global_state = $state;
-        }
 
     }
 
@@ -561,12 +1300,6 @@ class FiniteStateMachine
 
     }
 
-    public function getGlobalState()
-    {
-
-        return $this->_global_state;
-
-    }
     public static function getMap()
     {
 

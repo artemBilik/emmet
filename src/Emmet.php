@@ -51,8 +51,6 @@ class Emmet
             $str = '';
             $i = 0;
             $length = strlen($emmet_string) - 1;
-            $attrs_states = [FSM::ID, FSM::CLASS_NAME, FSM::ATTR];
-            $states_to_save = [FSM::OPERATOR, FSM::ARG_TXT, FSM::TAG];
 
             while (FSM::END !== $fsm->getState()) {
                 if ($i > $length) {
@@ -66,11 +64,13 @@ class Emmet
                         $i++;
                         continue;
                     } else {
-                        $value .= $emmet_string[++$i];
+                        $str .= $emmet_string[++$i];
                         ++$i;
                         continue;
                     }
                 }
+                
+                
 
                 if (FSM::ERROR === $fsm->getState()) {
                     $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($i));
@@ -82,15 +82,10 @@ class Emmet
 
                     $state = $fsm->getState();
                     $prev_state = $fsm->getPrevState();
-                    $global_state = $fsm->getGlobalState();
+                    $state_num = intval($state / 10);
+                    $prev_state_num = intval($prev_state / 10);
 
                     switch ($prev_state) {
-                        case FSM::TAG:
-                            if('' !== $str && $str !== ' '){
-                                $value->addText($str);
-                            }
-                            $node->setTag($value);
-                            break;
                         case FSM::OPERATOR:
                             $prev_sym = $emmet_string[$i - 2];
                             if (($prev_sym !== '^' && $prev_sym !== ')')&& '(' !== $str) {
@@ -98,89 +93,232 @@ class Emmet
                                 $node = new Node();
                             }
                             $pn->setOperator($str);
-//                            if (true !== ($pn_operator_status = $pn->setOperator($str))) {
-//                                $this->throwException($pn_operator_status . ' ' . $this->getCheckTheDocumentation($i));
-//                            }
                             break;
-                        case FSM::ID:
-                            if('' !== $str){
-                                $value->addText(' id='.$str);
-                            }
-                            $node->addAttributes($value);
-                            break;
-                        case FSM::CLASS_NAME:
-                            $value->addText(' class='.$str);
-                            $node->addAttributes($value);
-                            break;
-                        case FSM::ATTR:
-                            if('' !== $str){
-                                $value->addText(' '.$str);
-                            }
-                            $node->addAttributes($value);
-                            break;
-                        case FSM::AFTER_ATTR:
-                            break;
-                        case FSM::TEXT:
-                            if('' !== $str){
-                                $value->addText($str);
-                            }
-                            $node->setValue($value);
-                            break;
-                        case FSM::AFTER_TEXT:
-                            break;
-                        case FSM::TEXT_NODE:
-                            $node->setType(Node::TEXT_NODE);
+
+
+                        case FSM::TAG:
                             $value->addText($str);
-                            $node->setValue($value);
+                            if(1 !== $state_num){
+                                $node->setTag($value);
+                                $value = new Value($this->_data);
+                            }
                             break;
-                        case FSM::AFTER_TEXT_NODE:
-                            break;
-                        case FSM::MULTI:
-                            $node->setMultiplication($str);
-                            break;
-                        case FSM::VARIABLE:
+                        case FSM::TAG_VAR:
                             $value->addVariable($str);
                             break;
-                        case FSM::FUNC:
-                            if('' !== $str && ' ' !== $str) {
+                        case FSM::TAG_FUNC:
+                            if(FSM::TAG !== $state){
                                 $value->addFunction($str);
                             }
                             break;
-                        case FSM::ARGS:
+                        case FSM::TAG_ARGS:
                             break;
-                        case FSM::ARG_TXT:
-                            if('' !== $str){
-                                $value->addArgument($str, Value::TXT);
+                        case FSM::TAG_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::TAG_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        
+                        case FSM::ID:
+                            $value->addText($str);
+                            if(2 !== $state_num){
+                                $node->addAttributes($value);
+                                if(!(3 === $state_num || 4 === $state_num)){
+                                    $value = new Value($this->_data);
+                                }
                             }
                             break;
-                        case FSM::ARG_VAR:
-                            if('' !== $str){
-                                $value->addArgument($str, Value::VARIABLE);
+                        case FSM::ID_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::ID_FUNC:
+                            if(FSM::ID !== $state){
+                                $value->addFunction($str);
                             }
                             break;
-                        case FSM::HTML:
-                            $node->setType(Node::HTML);
+                        case FSM::ID_ARGS:
+                            break;
+                        case FSM::ID_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::ID_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        
+                        
+                        case FSM::CLASS_NAME:
+                            $value->addText($str);
+                            if(3 !== $state_num){
+                                $node->addAttributes($value);
+                                if(4 !== $state_num){
+                                    $value = new Value($this->_data);
+                                }
+                            }
+                            break;
+                        case FSM::CLASS_NAME_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::CLASS_NAME_FUNC:
+                            if(FSM::CLASS_NAME !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::CLASS_NAME_ARGS:
+                            break;
+                        case FSM::CLASS_NAME_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::CLASS_NAME_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        
+                        
+                        case FSM::ATTR:
+                            $value->addText($str);
+                            break;
+                        case FSM::ATTR_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::ATTR_FUNC:
+                            if(FSM::ATTR !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::ATTR_ARGS:
+                            break;
+                        case FSM::ATTR_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::ATTR_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        case FSM::AFTER_ATTR:
+                            $node->addAttributes($value);
+                            $value = new Value($this->_data);
+                            break;
+                        
+                        
+                        
+                        case FSM::TEXT:
+                            $value->addText($str);
+                            break;
+                        case FSM::TEXT_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::TEXT_FUNC:
+                            if(FSM::TEXT !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::TEXT_ARGS:
+                            break;
+                        case FSM::TEXT_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::TEXT_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        case FSM::AFTER_TEXT:
                             $node->setValue($value);
+                            $value = new Value($this->_data);
+                            break;
+                        
+                        
+                        case FSM::TEXT_NODE:
+                            $value->addText($str);
+                            break;
+                        case FSM::TEXT_NODE_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::TEXT_NODE_FUNC:
+                            if(FSM::TEXT_NODE !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::TEXT_NODE_ARGS:
+                            break;
+                        case FSM::TEXT_NODE_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::TEXT_NODE_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        case FSM::AFTER_TEXT_NODE:
+                            $node->setType(Node::TEXT_NODE);
+                            $node->setValue($value);
+                            $value = new Value($this->_data);
+                            break;
+                        
+                        
+                        case FSM::MULTI:
+                            $value->addText($str);
+                            if(7 !== $state_num){
+                                $node->setMultiplication($value->getToSet());
+                                if(7 !== $state_num){
+                                    $value = new Value($this->_data);
+                                }
+                            }
+                            break;
+                        case FSM::MULTI_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::MULTI_FUNC:
+                            if(FSM::MULTI !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::MULTI_ARGS:
+                            break;
+                        case FSM::MULTI_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::MULTI_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
+                            break;
+                        
+                        
+                        case FSM::HTML:
+                            if(!$value->isEmpty()){
+                                $node->setType(Node::HTML);
+                                $node->setValue($value);
+                                $value = new Value($this->_data);
+                            }
+                            break;
+                        case FSM::HTML_VAR:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::HTML_FUNC:
+                            if(FSM::HTML !== $state){
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::HTML_ARGS:
+                            break;
+                        case FSM::HTML_ARG_TXT:
+                            $value->addArgument($str, Value::TXT);
+                            break;
+                        case FSM::HTML_ARG_VAR:
+                            $value->addArgument($str, Value::VARIABLE);
                             break;
                         default:
                             throw new \Exception('Unhandled Finite State Machine State. ' . $this->getCheckTheDocumentation($i));
                             break;
                     }
-                        //echo getStateName($state) . ' - ' . getStateName($prev_state) . '<br>';
-                    if(
-                        (in_array($state, $attrs_states) && in_array($prev_state, $attrs_states)) ||
-                        ($prev_state === FSM::VARIABLE || $prev_state === FSM::FUNC) ||
-                        ((FSM::VARIABLE === $state || FSM::FUNC === $state) && FSM::HTML !== $global_state && FSM::TEXT !== $global_state ) ||
-                        (FSM::ARG_TXT === $state || FSM::ARGS === $state || FSM::ARG_VAR === $state) ||
-                        (FSM::ARG_TXT === $prev_state || FSM::ARGS === $prev_state || FSM::ARG_VAR === $prev_state)
+                    if((
+                            FSM::OPERATOR === $state || FSM::TAG === $state || FSM::HTML_ARG_TXT === $state ||
+                            FSM::TEXT_ARG_TXT === $state || FSM::TEXT_NODE_ARG_TXT === $state ||
+                            FSM::TAG_ARG_TXT === $state || FSM::ID_ARG_TXT === $state ||
+                            FSM::CLASS_NAME_ARG_TXT === $state || FSM::ATTR_ARG_TXT === $state)
+                        && ('`' !== $symbol && '%' !== $symbol)
                     ){
-                    } else {
-                        $value = new Value($this->_data);
-                    }
-
-
-                    if(($state == FSM::OPERATOR || $state === FSM::TAG || $state === FSM::ARG_TXT) && $symbol !== '`' && $symbol !== '%'){
                         $str = $symbol;
+                    } elseif(FSM::ID === $state && 2 !== $prev_state_num){
+                        $str = ' id=';
+                    } elseif(FSM::CLASS_NAME === $state && (3 !== $prev_state_num || FSM::CLASS_NAME === $prev_state)){
+                        $str = ' class=';
+                    } elseif(FSM::ATTR === $state && (4 !== $prev_state_num)){
+                        $str = ' ';
                     } else {
                         $str = '';
                     }
@@ -233,6 +371,7 @@ class Emmet
     private function getCheckTheDocumentation($i)
     {
 
+        $i = $i - 6;
         return  'Check the documentation for the right syntax to use near "' . htmlspecialchars(substr($this->_emmet_string, 0, $i)) . '<strong style="color:red;">' . htmlspecialchars(substr($this->_emmet_string, $i)) . '</strong>".';
 
     }
