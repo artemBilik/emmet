@@ -21,9 +21,12 @@ class Value
         $this->_data = $data;
 
     }
-    // INTERFACE
-    /*
-     * Add textNode to self::_value
+    /**
+     * @param string $text
+     *
+     *    * Add textNode to self::_value
+     *
+     * @return bool
      */
     public function addText($text)
     {
@@ -35,8 +38,12 @@ class Value
         return true;
 
     }
-    /*
-     * Add functionNode to self::_value
+    /**
+     * @param string $function_name
+     *
+     *    * Add functionNode to self::_value
+     *
+     * @return bool
      */
     public function addFunction($function_name)
     {
@@ -49,19 +56,25 @@ class Value
         return true;
 
     }
-    /*
-     * Add argument to last self::_value function
-     * throw Exception if last self::_value is not a function
+    /**
+     * @param string $arg_value
+     * @param self::TXT|self::VARIABLE $arg_type
+     *
+     *    * Add argument to last self::_value function
+     *    * throw Exception if last self::_value is not a function
+     *
+     * @return bool
+     * @throws \Exception
      */
     public function addArgument($arg_value, $arg_type)
     {
 
         if(empty($this->_value) || !in_array($arg_type, [self::VARIABLE, self::TXT])){
-            return false;
+            $this->throwException('There is no function to add an argument "' . $arg_value . '".');
         }
-        $func = $this->_value[count($this->_value) - 1];
+        $func = &$this->_value[count($this->_value) - 1];
         if(self::FUNC !== $func['type']){
-            return false;
+            $this->throwException('There is no function to add an argument "' . $arg_value . '".');
         }
         $func['args'][] = [
             'type'  => $arg_type,
@@ -70,8 +83,19 @@ class Value
         return true;
 
     }
-    /*
-     * Add variableNode to self::_value
+    private function throwException($message)
+    {
+
+        throw new \Exception($message);
+
+    }
+
+    /**
+     * @param string $variable
+     *
+     *  * Add variableNode to self::_value
+     *
+     * @return null
      */
     public function addVariable($variable)
     {
@@ -82,11 +106,12 @@ class Value
         ];
 
     }
-    /*
-     * Return $this if self::_value has function or variable
-     * And return $text if self::_value has only text
+    /**
+     *    * Return $this if self::_value has function or variable
+     *    * And return $text if self::_value has only text
+     * @return $this|string
      */
-    public function get()
+    public function getToSet()
     {
 
         $string = '';
@@ -94,46 +119,44 @@ class Value
             if(in_array($item['type'], [self::VARIABLE, self::FUNC])){
                 return $this;
             } else {
-                $string .= $this->getNodeValue($item);
+                $string .= $this->getNodeValue($item, 0, '');
             }
         }
         return $string;
     }
-    /*
-     * return handled self::_value
+    /**
+     * @param int $number
+     * @param string $value
+     *    * return handled self::_value
+     * @return string
      */
-    public function __toString()
+    public function get($number, $value)
     {
 
         $string = '';
         foreach($this->_value as $item){
-            $string .= $this->getNodeValue($item);
+            $string .= $this->getNodeValue($item, $number, $value);
         }
         return $string;
 
     }
-    /*
-     * Includes array with functions config
-     * add it to global self::$_config
+    /**
+     * @param array $node
+     * @param int $number
+     * @param string $value
+     *    * Get Node value in depends of type(text, function, variable)
+     * @return mixed|string
      */
-    public function includeConfig(array $config)
-    {}
-
-
-    // SERVICE
-    /*
-     * Get Node value in depends of type(text, function, variable)
-     */
-    private function getNodeValue($node)
+    private function getNodeValue($node, $number, $value)
     {
 
         switch($node['type']){
             case self::TXT:
                 return $node['value'];
             case self::VARIABLE:
-                return $this->_data->get($node['name']);
+                return $this->_data->get($node['name'], $number, $value);
             case self::FUNC:
-                return $this->_data->func($node['name'], $node['args']);
+                return $this->_data->func($node['name'], $node['args'], $value, $number);
             default:
                 return '';
         }
