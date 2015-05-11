@@ -3,19 +3,24 @@
 namespace emmet;
 
 use emmet\FiniteStateMachine as FSM;
-require_once __DIR__ . DIRECTORY_SEPARATOR . "Element.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "Node.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "FiniteStateMachine.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "PolishNotation.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "Data.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "EmmetException.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "Value.php";
 
-class Emmet extends FiniteStateMachine
+class Emmet
 {
 
     private $_tree = null;
     private $_emmet_string = '';
     private $_data = null;
 
+    /**
+     * @param string $emmet_string
+     * @throws EmmetException
+     */
     public function __construct($emmet_string)
     {
 
@@ -29,32 +34,195 @@ class Emmet extends FiniteStateMachine
 
     }
 
-    /*
-     * Parse emmet string;
-     * create an element tree;
+    /**
+     * parse emmet string
+     * set self::_tree
+     * @return null
      */
     private function build()
     {
 
-        $element = new Element();
-        $element->setRoot();
-        $this->_tree = $element;
+        try {
+            $emmet_string = 'root>' . $this->_emmet_string;
+            $pn = new PolishNotation();
+            $fsm = new FSM(FSM::TAG);
+            $node = new Node(Node::ROOT);
+            $value = new Value($this->_data);
+            $str = '';
+            $i = 0;
+            $length = strlen($emmet_string) - 1;
+
+            while (FSM::END !== $fsm->getState()) {
+                if ($i > $length) {
+                    $symbol = '';
+                } else {
+                    $symbol = $emmet_string[$i];
+                }
+
+                if ('/' === $symbol) {
+                    if ($i === $length) {
+                        $i++;
+                        continue;
+                    } else {
+                        $value .= $emmet_string[++$i];
+                        ++$i;
+                        continue;
+                    }
+                }
+
+                if (FSM::ERROR === $fsm->getState()) {
+                    $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($i));
+                }
+
+                $fsm->setState($symbol);
+
+                if ($fsm->isStateChanged()) {
+
+                    $state = $fsm->getState();
+                    $prev_state = $fsm->getPrevState();
+                    $global_state = $fsm->getGlobalState();
+
+                    switch ($fsm->getPrevState()) {
+                        case FSM::TAG:
+                            if('' !== $str && $str !== ' '){
+                                $value->addText($str);
+                            }
+                            $node->setTag($value);
+                            break;
+                        case FSM::OPERATOR:
+                            if (!in_array($emmet_string[$i - 2], array('^', ')')) && '(' !== $str) {
+                                $pn->setOperand($node);
+                                $node = new Node();
+                            }
+                            if (true !== ($pn_operator_status = $pn->setOperator($str))) {
+                                $this->throwException($pn_operator_status . ' ' . $this->getCheckTheDocumentation($i));
+                            }
+                            break;
+                        case FSM::ID:
+                            if('' !== $str && $str !== ' '){
+                                $value->addText(' id='.$str);
+                            }
+                            $node->addAttributes($value);
+                            break;
+                        case FSM::CLASS_NAME:
+                            $value->addText(' class='.$str);
+                            $node->addAttributes($value);
+                            break;
+                        case FSM::ATTR:
+                            if('' !== $str && $str !== ' '){
+                                $value->addText(' '.$str);
+                            }
+                            $node->addAttributes($value);
+                            break;
+                        case FSM::AFTER_ATTR:
+                            break;
+                        case FSM::TEXT:
+                            if('' !== $str){
+                                $value->addText($str);
+                            }
+                            $node->setValue($value);
+                            break;
+                        case FSM::AFTER_TEXT:
+                            break;
+                        case FSM::TEXT_NODE:
+                            $node->setType(Node::TEXT_NODE);
+                            $value->addText($str);
+                            $node->setValue($value);
+                            break;
+                        case FSM::AFTER_TEXT_NODE:
+                            break;
+                        case FSM::MULTI:
+                            $node->setMultiplication($str);
+                            break;
+                        case FSM::VARIABLE:
+                            $value->addVariable($str);
+                            break;
+                        case FSM::FUNC:
+                            if('' !== $str && ' ' !== $str) {
+                                $value->addFunction($str);
+                            }
+                            break;
+                        case FSM::ARGS:
+                            break;
+                        case FSM::ARG_TXT:
+                            if('' !== $str && ' ' !== $str){
+                                $value->addArgument($str, Value::TXT);
+                            }
+                            break;
+                        case FSM::ARG_VAR:
+                            if('' !== $str && ' ' !== $str){
+                                $value->addArgument($str, Value::VARIABLE);
+                            }
+                            break;
+                        case FSM::HTML:
+                            $node->setType(Node::HTML);
+                            $node->setValue($value);
+                            break;
+                        default:
+                            throw new \Exception('Unhandled Finite State Machine State. ' . $this->getCheckTheDocumentation($i));
+                            break;
+                    }
+                        //echo getStateName($state) . ' - ' . getStateName($prev_state) . '<br>';
+                    $attrs_states = [FSM::ID, FSM::CLASS_NAME, FSM::ATTR];
+                    if(
+                        (FSM::ARG_TXT === $state || FSM::ARGS === $state || FSM::ARG_VAR === $state) ||
+                        (FSM::ARG_TXT === $prev_state || FSM::ARGS === $prev_state || FSM::ARG_VAR === $prev_state) ||
+                        ($prev_state === FSM::VARIABLE || $prev_state === FSM::FUNC) ||
+                        (in_array($state, $attrs_states) && in_array($prev_state, $attrs_states)) ||
+                        ((FSM::VARIABLE === $state || FSM::FUNC === $state) && FSM::HTML !== $global_state && FSM::TEXT !== $global_state )){
+                    } else {
+                        $value = new Value($this->_data);
+                    }
+                    if (FSM::END === $fsm->getState() && FSM::OPERATOR !== $fsm->getPrevState()) {
+                        $pn->setOperand($node);
+                    }
+                    if(in_array($fsm->getState(), [FSM::OPERATOR, FSM::ARG_TXT, FSM::TAG]) && $symbol !== '`' && $symbol !== '%'){
+                        $str = $symbol;
+                    } else {
+                        $str = '';
+                    }
+                } else {
+                    if(FSM::SKIP !== $fsm->getState()){
+                        $str .= $symbol;
+                    }
+                }
+                ++$i;
+            }
+
+            $tree = $pn->generateTree();
+            if ($tree instanceof Node) {
+                $this->_tree = $tree;
+            } else {
+                $this->throwException($tree);
+            }
+        } catch(\Exception $e){
+            $this->throwException($e->getMessage());
+        }
 
     }
 
-    /*
-     * Create an html string
+
+    /**
+     * @param array $data
+     * Create an html string from self::_tree
+     * @return string
      */
-    public function create($data = [])
+    public function create(array $data = [])
     {
 
-        return $this->_tree->getHtml(function($variable) use($data){
-            extract($data);
-            return eval('return $'.$variable . ';');
-        });
+        try{
+            $this->_data->setData($data);
+            return $this->_tree->getHtml();
+        } catch(\Exception $e){
+            $this->throwException($e->getMessage());
+        }
 
     }
 
+    /**
+     * @param $i
+     * @return string
+     */
     private function getCheckTheDocumentation($i)
     {
 
@@ -62,13 +230,29 @@ class Emmet extends FiniteStateMachine
 
     }
 
-    public function __destruct()
+    public static function addFunctions(array $functions)
     {
 
-        $this->_tree->drop();
+        Data::setFunctions($functions);
 
     }
 
+    /**
+     * drop self::_tree
+     */
+    public function __destruct()
+    {
+
+        if($this->_tree instanceof Tree) {
+            $this->_tree->drop();
+        }
+
+    }
+
+    /**
+     * @param string $message
+     * @throws EmmetException
+     */
     private function throwException($message)
     {
 
@@ -77,105 +261,3 @@ class Emmet extends FiniteStateMachine
     }
 
 }
-
-
-
-
-
-
-//private function build()
-//{
-//
-//    $emmet_string        = 'root>'.$this->_emmet_string;
-//
-//    $fsm     = new FSM(FSM::GET_TAG);
-//    $pn      = new PolishNotation();
-//    $element = new Element();
-//    $element->setRoot();
-//    $value   = '';
-//    $i       = 0;
-//    $length = strlen($emmet_string) - 1;
-//
-//    while(FSM::END !== $fsm->getState()){
-//        if($i > $length){
-//            $symbol = '';
-//        } else {
-//            $symbol = $emmet_string[$i];
-//        }
-//
-//        if('/' === $symbol){
-//            if($i === $length){
-//                $i++;
-//                continue;
-//            } else {
-//                $value .= $emmet_string[++$i];
-//                ++$i;
-//                continue;
-//            }
-//        }
-//
-//        if(FSM::ERROR === $fsm->getState()){
-//            $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($emmet_string, $i));
-//        }
-//        $fsm->setState($symbol);
-//        if($fsm->isStateChanged()){
-//            switch($fsm->getPrevState()){
-//                case FSM::GET_TAG:
-//                    $element->setTag($value);
-//                    break;
-//                case FSM::SET_OPERATOR:
-//                    if(!in_array($emmet_string[$i - 2], array('^', ')')) && '(' !== $value){
-//                        $pn->setOperand($element);
-//                        $element = new Element();
-//                    }
-//                    if(true !== ($pn_operator_status = $pn->setOperator($value))){
-//                        $this->throwException($pn_operator_status.' '.$this->getCheckTheDocumentation($emmet_string, $i));
-//                    }
-//                    break;
-//                case FSM::GET_ID:
-//                    $element->addAttributes('id='.substr($value, 1));
-//                    break;
-//                case FSM::GET_CLASS:
-//                    $element->addAttributes('class='.substr($value, 1));
-//                    break;
-//                case FSM::GET_ATTR:
-//                    $element->addAttributes(substr($value, 1));
-//                    break;
-//                case FSM::GET_TEXT:
-//                    $element->setValue(substr($value,1));
-//                    break;
-//                case FSM::GET_MULTIPLICATION:
-//                    $element->setMultiplication(substr($value,1));
-//                    break;
-//                case FSM::GET_TEXT_NODE:
-//                    $element = new TextNode();
-//                    $element->setValue(substr($value,1));
-//                    break;
-//                case FSM::WAIT_AFTER_ATTR:
-//                    break;
-//                case FSM::WAIT_AFTER_TEXT_NODE:
-//                    break;
-//                case FSM::WAIT_AFTER_TEXT:
-//                    break;
-//                default:
-//                    $this->throwException('Unhandled Finite State Machine State. '.$this->getCheckTheDocumentation($emmet_string, $i));
-//                    break;
-//            }
-//            if(FSM::END === $fsm->getState() && FSM::SET_OPERATOR !== $fsm->getPrevState()){
-//                $pn->setOperand($element);
-//            }
-//            $value = $symbol;
-//        } else {
-//            $value .= $symbol;
-//        }
-//        ++$i;
-//    }
-//
-//    $tree = $pn->generateTree();
-//    if($tree instanceof Node){
-//        $this->_tree = $tree;
-//    } else {
-//        $this->throwException($tree);
-//    }
-//
-//}
