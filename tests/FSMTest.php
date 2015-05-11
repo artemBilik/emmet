@@ -3,14 +3,14 @@ namespace emmet\test;
 
 use \emmet\FiniteStateMachine as FSM;
 
-require_once __DIR__ . '/../src/FiniteStateMachine.php';
+require_once __DIR__ . '/../src/Emmet.php';
 
 
 class FSMTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Exception
      */
     public function testInit()
     {
@@ -21,7 +21,13 @@ class FSMTest extends \PHPUnit_Framework_TestCase
         new FSM(FSM::OPERATOR);
 
     }
+    public function testMap()
+    {
 
+        $fsm = new FSM();
+        $this->assertTrue($fsm->checkMap(), 'Map is not correct.');
+
+    }
 
     /**
      * @dataProvider emmetProvider
@@ -35,7 +41,7 @@ class FSMTest extends \PHPUnit_Framework_TestCase
     }
     /**
      * @dataProvider errorsProvider
-     * @expectedException Exception
+     * @expectedException \Exception
      *
      */
     public function testErrors($emmet)

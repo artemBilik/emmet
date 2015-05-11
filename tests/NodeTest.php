@@ -1,127 +1,169 @@
 <?php
 namespace emmet\test;
 
-use \emmet\TextNode as TextNode;
-use \emmet\Element as Element;
+use \emmet\Node as Node;
+use \emmet\Value as Value;
+use \emmet\Data as Data;
 
-require_once __DIR__ . '/../src/Element.php';
+require_once __DIR__ . '/../src/Node.php';
+require_once __DIR__ . '/../src/Value.php';
+require_once __DIR__ . '/../src/Data.php';
 
 class NodeTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @expectedException Exception
-     * testing isRoot and setRoot methods
-     */
-    public function testRoot()
+
+    public function testSetType()
     {
 
-        $root_element = new Element();
-        $this->assertFalse($root_element->isRoot(), 'New Element is root.');
-        $root_element->setRoot();
-        $this->assertTrue($root_element->isRoot(), 'Element set to Root is not a root.');
+        $node = new Node();
 
-        $child_element = new Element();
-        $child_element->addTo($root_element);
-        $child_element->setRoot();
+        $class = new \ReflectionClass('\emmet\Node');
+        $type = $class->getProperty('_type');
+        $type->setAccessible(true);
+
+        $node->setType(Node::TAG);
+        $this->assertTrue($type->getValue($node) === Node::TAG);
+        $node->setType(Node::TEXT_NODE);
+        $this->assertTrue($type->getValue($node) === Node::TEXT_NODE);
+        $node->setType(Node::HTML);
+        $this->assertTrue($type->getValue($node) === Node::HTML);
+        $node->setType(Node::ROOT);
+        $this->assertTrue($type->getValue($node) === Node::ROOT);
 
     }
 
     /**
-     * testing hasParent and getParent methods
+     * @expectedException \Exception
      */
-    public function testParent()
+    public function testWrongType()
     {
 
-        $parent_element = new Element();
-        $this->assertFalse($parent_element->hasParent(), 'New Element has parent element.');
-        $this->assertNull($parent_element->getParent(), 'Parent element of the new Element is not null.');
+        $node = new Node();
+        $node->setType(123);
 
-        $child_element = new Element();
-        $child_element->addTo($parent_element);
-        $this->assertTrue($child_element->hasParent(), 'Added Element has not parent element.');
-        $this->assertTrue($parent_element === $child_element->getParent(), 'Parent element of the added element is not the element which it was added.');
+    }
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetRoot()
+    {
+
+        $node = new Node(Node::ROOT);
+        $this->assertTrue($node->isRoot());
+
+        $child_node = new Node(Node::TAG);
+        $child_node->addTo($node);
+
+        $child_node->setType(Node::HTML);
+        $child_node->setType(Node::ROOT);
+
+    }
+    /**
+     * @expectedException \Exception
+     */
+    public function testRootAddToRoot()
+    {
+
+        $node = new Node(Node::TAG);
+        $child = new Node(Node::ROOT);
+        $child->addTo($node);
 
     }
 
-    public function testAddTo()
+    public function testTagHtml()
     {
 
-        $parent = new Element();
-        $child = new Element();
-        $this->assertNull($child->getParent(), 'testAddTo. Parent element is not null.');
-        $this->assertNull($parent->getFirstChild('testAddTo. First child of the parent element is not null.'));
-        $child->addTo($parent);
-        $this->assertTrue($parent === $child->getParent('testAddTo. Parents elements do not match.'));
-        $this->assertTrue($child === $parent->getFirstChild(), 'testAddTo. Child elements do not match.');
+        $node = new Node(Node::ROOT);
+
+        $child = new Node(Node::TAG);
+        $sibling = new Node(Node::TAG);
+
+        $child->addTo($node);
+        $child->addSibling($sibling);
+
+        $value = new Value(new Data());
+        $value->addText('text node of the child node');
+        $child->setValue($value);
+
+        $value = new Value(new Data());
+        $value->addText('one more text node of the child node');
+        $child->setValue($value);
+
+        $value = new Value(new Data());
+        $value->addText('header');
+        $child->setTag($value);
+
+        $hr = new Node(Node::TAG);
+        $value = new Value(new Data());
+        $value->addText('hr');
+        $hr->setTag($value);
+
+        $value = new Value(new Data());
+        $value->addText('alone');
+        $hr->addAttributes($value);
+
+        $hr->addTo($child);
+
+        $value = new Value(new Data());
+        $value->addText('class=headerClass1 id=headerId color=red class=headerClass2');
+        $child->addAttributes($value);
+
+
+        $value = new Value(new Data());
+        $value->addText('text node of the sibling node');
+        $sibling->setValue($value);
+
+        $value = new Value(new Data());
+        $value->addText('section');
+        $sibling->setTag($value);
+
+        $value = new Value(new Data());
+        $value->addText('alone');
+        $sibling->addAttributes($value);
+
+        $sibling->setMultiplication(2);
+
+
+        $html = '<header class="headerClass1 headerClass2" id="headerId" color="red" >text node of the child nodeone more text node of the child node<hr alone="alone" /></header><section alone="alone" >text node of the sibling node</section><section alone="alone" >text node of the sibling node</section>';
+        $this->assertEquals($node->getHtml(), $html);
 
     }
 
-    public function testAddAndSibling()
+    public function testTextNodeHtml()
     {
 
-        $parent      = new Element();
-        $child_one   = new Element();
-        $child_two   = new Element();
-        $child_three = new Element();
-        $child_four  = new Element();
+        $node = new Node(Node::ROOT);
 
-        $child_one->addTo($parent);
-        $child_one->addSibling($child_two);
-        $child_three->addTo($parent);
-        $child_one->addSibling($child_four);
+        $tn = new Node(Node::TEXT_NODE);
+        $value = new Value(new Data());
+        $value->addText('text node');
+        $tn->setValue($value);
+        $tn->setMultiplication(2);
 
-        $this->assertTrue($parent->getFirstChild() === $child_one);
-        $this->assertTrue($child_one->getRightSibling() === $child_two);
-        $this->assertTrue($child_two->getRightSibling() === $child_three);
-        $this->assertTrue($child_three->getRightSibling() === $child_four);
-
-        $this->assertTrue($parent === $child_one->getParent());
-        $this->assertTrue($parent === $child_two->getParent());
-        $this->assertTrue($parent === $child_three->getParent());
-        $this->assertTrue($parent === $child_four->getParent());
-    }
-
-    public function testAddSibling()
-    {
-
-        $element = new Element();
-        $parent  = new Element();
-        $sibling = new Element();
-
-        $element->addTo($parent);
-        $element->addSibling($sibling);
-
-        $this->assertTrue($parent === $sibling->getParent(), 'testAddSibling. Parent elements do not match.');
-        $this->assertTrue($sibling === $element->getRightSibling(), 'testAddSibling. Sibling elements do not match.');
-
-        $sibling_one = new Element();
-        $element->addSibling($sibling_one);
-
-        $this->assertTrue($parent === $sibling_one->getParent(), 'testAddSibling.nextSibling. Parent elements do not match.');
-        $this->assertTrue($sibling === $element->getRightSibling('testAddSibling.nextSibling. Sibling elements do not match. sibling element.'));
-        $this->assertTrue($sibling_one === $sibling->getRightSibling(), 'testAddSibling.nextSibling. Sibling elements do not match sibling_on sibling.');
+        $this->assertEquals($tn->getHtml(), 'text nodetext node');
 
     }
 
-    public function testMultiplication()
+    public function testHtmlHtml()
     {
 
-        $element = new Element();
-        $this->assertEquals(1,$element->getMultiplication());
+        $html = new Node(Node::HTML);
 
-        $element->setMultiplication('12');
-        $this->assertEquals(12, $element->getMultiplication());
+        $data = new Data();
+        $data->setData(['html' => 'html{{value}}']);
+        $value = new Value($data);
+        $value->addVariable('html');
+        $html->setValue($value);
 
+        $node = new Node(Node::TAG);
+        $value = new Value(new Data());
+        $value->addText('hr');
+        $node->setTag($value);
+        $node->addTo($html);
 
-        $element->setMultiplication(-1);
-        $this->assertEquals(1, $element->getMultiplication());
-
-
-        $element->setMultiplication('4asdf');
-        $this->assertEquals(4, $element->getMultiplication());
-
-
+        $this->assertEquals($html->getHtml(), 'html<hr />');
 
     }
+
 }

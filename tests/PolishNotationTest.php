@@ -1,10 +1,12 @@
 <?php
 namespace emmet\test;
 
-use \emmet\Element;
+use \emmet\Node;
+use \emmet\PolishNotation;
+use \emmet\Value;
+use \emmet\Data;
 
-require_once __DIR__ . '/../src/Element.php';
-require_once __DIR__ . '/PolishNotation.php';
+require_once __DIR__ . '/../src/Emmet.php';
 
 class PolishNotationTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +39,12 @@ class PolishNotationTest extends \PHPUnit_Framework_TestCase
     {
 
         $pn = new PolishNotation();
-        $pn->setOutput($postfix);
+
+        $class = new \ReflectionClass ('PolishNotation');
+        $method = $class->getMethod ('setOutput');
+        $method->setAccessible(true);
+
+        $method->invokeArgs($pn, $postfix);
         if(is_string($message = $pn->generateTree())){
             throw new \Exception($message);
         }
@@ -124,11 +131,13 @@ class PolishNotationTest extends \PHPUnit_Framework_TestCase
         $pn = new PolishNotation();
         foreach($collection as $item){
             if(!in_array($item, array('+', '>', '^', '(', ')'))){
-                $el = new Element();
+                $el = new Node();
                 if('root' === $item){
-                    $el->setRoot();
+                    $el->setType(Node::ROOT);
                 }
-                $el->setTag($item);
+                $value = new Value(new Data());
+                $value->addText($item);
+                $el->setTag($value);
                 $pn->setOperand($el);
             } else {
                 if( true !== ($message = $pn->setOperator($item))){
@@ -137,9 +146,6 @@ class PolishNotationTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        if(is_string(($output = $pn->endOutput()))){
-            throw new \Exception($message);
-        }
         return $pn->getOutput();
         
     }
@@ -150,11 +156,13 @@ class PolishNotationTest extends \PHPUnit_Framework_TestCase
         $postfix = array();
         foreach($collection as $item){
             if(!$this->isOperator($item)){
-                $el = new Element();
+                $el = new Node();
                 if('root' === $item){
-                    $el->setRoot();
+                    $el->setType(Node::ROOT);
                 }
-                $el->setTag($item);
+                $value = new Value(new Data());
+                $value->addText($item);
+                $el->setTag($value);
                 $postfix[] = $el;
             } else {
                 $postfix[] = $item;
