@@ -4,21 +4,32 @@ namespace emmet;
 class Data
 {
 
-    const TXT = 1;
-    const VARIABLE = 2;
+    const VALUE = '{{value}}';
 
     private $_data = [];
 
     private static $_functions = [];
 
+    /**
+     * @param array $data
+     */
     public function setData(array $data)
     {
 
         $this->_data = $data;
 
     }
-
-    public function get($variable, $number = 1)
+    /**
+     * @param string $variable
+     * @param int$number
+     * @param string $added_value
+     *
+     * Find the value of the variable in array self::_data
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function get($variable, $number, $added_value)
     {
 
         $memory = $this->_data;
@@ -30,52 +41,107 @@ class Data
             if('$' === $symbol){
                 $symbol = $number;
             }
-            if(('[' === $symbol || '-' === $symbol || ']' === $symbol || '{' === $symbol || '}' === $symbol || ';' === $symbol) && '' !== $value){
-                if($state === '>'){
-                    if(isset($memory->$value)){
-                        $memory = $memory->$value;
+
+            if((('[' === $symbol || ']' === $symbol || '{' === $symbol || '}' === $symbol  || '.' === $symbol || ';' === $symbol))){
+                if('' !== $value){
+                    if($state === '.'){
+                        if(isset($memory->$value)){
+                            $memory = $memory->$value;
+                        } else {
+                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                        }
+                    } elseif('{' === $state){
+                        if(isset($memory{$value})){
+                            $memory = $memory{$value};
+                        } else {
+                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                        }
                     } else {
-                        return false;
-                    }
-                } elseif('{' === $state){
-                    if(isset($memory{$value})){
-                        $memory = $memory{$value};
-                    } else {
-                        return false;
-                    }
-                } else {
-                    if(isset($memory[$value])){
-                        $memory = $memory[$value];
-                    } else {
-                        return false;
+                        if(isset($memory[$value])){
+                            $memory = $memory[$value];
+                        } else {
+                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                        }
                     }
                 }
+
                 $value = '';
                 $state = $symbol;
+
                 continue;
-            } elseif('>' === $symbol){
-                $value = '';
-                $state = $symbol;
-                continue;
-            } else {
+            }  else {
                 $value .= $symbol;
             }
+        }
+
+        if(null !== $added_value && is_string($memory)){
+            $memory = str_replace(self::VALUE, $added_value , $memory);
         }
         return $memory;
 
     }
 
-    public function func($name, array $args = [], $value = null, $number = 1)
+    /**
+     * @param string $name
+     * @param array $args
+     * @param string $value
+     * @param int $number
+     *
+     * call the function from self::$_functions
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function func($name, array $args = [], $value = null, $number = 0)
     {
 
-
+        if(array_key_exists($name, self::$_functions)){
+            if(is_string(self::$_functions[$name])){
+                $result = self::$_functions[$name];
+                if($value && '' !== $value){
+                    $result = str_replace(self::VALUE, $value, $result);
+                }
+                return $result;
+            } elseif(self::$_functions[$name] instanceof \Closure){
+                $args_for_call = [];
+                foreach($args as $arg){
+                    if(Value::VARIABLE === $arg['type']){
+                        $args_for_call[] = $this->get($arg['value'], $number, null);
+                    } else {
+                        $args_for_call[] = $arg['value'];
+                    }
+                }
+                if($value){
+                    $args_for_call[] = $value;
+                }
+                return call_user_func_array(self::$_functions[$name], $args_for_call);
+            } else {
+                $this->throwException('Function "' . $name .'" must be a callable or a string.');
+            }
+        } else {
+            $this->throwException('Function "' . $name . '" doesn\'t exists in functions list.');
+        }
 
     }
 
+    /**
+     * @param array $functions
+     */
     public static function setFunctions(array $functions)
     {
 
+        self::$_functions = array_merge(self::$_functions, $functions);
 
+    }
+
+    /**
+     * @param string $message
+     * @throws \Exception
+     */
+    private function throwException($message)
+    {
+
+        throw new \Exception($message);
 
     }
 
