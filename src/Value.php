@@ -124,6 +124,13 @@ class Value
         }
         return $string;
     }
+
+    public function isEmpty()
+    {
+
+        return empty($this->_value);
+
+    }
     /**
      * @param int $number
      * @param string $value
