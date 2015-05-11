@@ -162,7 +162,7 @@ class Node extends Tree
     private $_number = 0;
     private $_minimized = false;
 
-    private static $_self_closing_tags  = '%hr%br%input%link%meta%';
+    private static $_self_closing_tags  = '%hr%br%input%link%meta%img';
 
     public function __construct($type = self::TAG)
     {
@@ -399,12 +399,13 @@ class Node extends Tree
 
         $var = '_'.$var;
         if($this->$var instanceof Value){
-            $value = $this->$var->get($this->_number, $value);
-            if(false === $this->_minimized){
-                $this->$var = $this->$var->getToSet();
-                $this->_minimized = true;
-            }
-            return $value;
+            return $this->$var->get($this->_number, $value);
+//            $value = $this->$var->get($this->_number, $value);
+//            if(false === $this->_minimized){
+//                $this->$var = $this->$var->getToSet();
+//                $this->_minimized = true;
+//            }
+//            return $value;
         } else {
             return $this->$var;
         }
