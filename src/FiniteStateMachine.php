@@ -417,21 +417,27 @@ class FiniteStateMachine
         self::TAG, self::ID, self::CLASS_NAME, self::ATTR, self::TEXT, self::TEXT_NODE, self::MULTI,
     ];
 
-
-    public function __construct($state = null)
+    /**
+     * @param int $state
+     * @throws \Exception
+     */
+    public function __construct($state = 0)
     {
 
-        if(null === $state){
+        if(0 === $state){
             $state = self::TAG;
         }
         if(!in_array($state, self::$_initial_states)){
             $this->throwException('FiniteStateMachine::__construct(int state = null). Undefined Initial State. Use the list of the initial states.');
         } else {
-            $this->_state = $state;
+            $this->setNewState($state);
         }
 
     }
 
+    /**
+     * @return int|null
+     */
     public function getState()
     {
 
@@ -439,6 +445,11 @@ class FiniteStateMachine
 
     }
 
+    /**
+     * @param char $symbol
+     * @return bool
+     * @throws \Exception
+     */
     public function setState($symbol)
     {
 
@@ -476,18 +487,25 @@ class FiniteStateMachine
         return true;
     }
 
+    /**
+     * @param int $state
+     */
     private function setNewState($state)
     {
 
         $this->_prev_state       = $this->_state;
-        $this->_is_state_changed = true;
+        $this->_is_state_changed = (self::SKIP === $state) ? false : true;
         $this->_state            = $state;
+
         if(in_array($state, self::$_global_states)){
             $this->_global_state = $state;
         }
 
     }
 
+    /**
+     * @return bool
+     */
     public function isStateChanged()
     {
 
@@ -495,6 +513,9 @@ class FiniteStateMachine
 
     }
 
+    /**
+     * @return int
+     */
     public function getPrevState()
     {
 
@@ -502,13 +523,23 @@ class FiniteStateMachine
 
     }
 
+    /**
+     * @param string $message
+     * @throws \Exception
+     */
     private function throwException($message)
     {
 
-        throw new \EmmetException($message);
+        throw new \Exception($message);
 
     }
 
+    /**
+     * check is map is correct
+     * self::_map should have all self::_states
+     * self::_map[state] should have all self::_alphabet
+     * @return bool
+     */
     public function checkMap()
     {
 
@@ -530,6 +561,12 @@ class FiniteStateMachine
 
     }
 
+    public function getGlobalState()
+    {
+
+        return $this->_global_state;
+
+    }
     public static function getMap()
     {
 
