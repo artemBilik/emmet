@@ -69,7 +69,7 @@ class Value
     public function addArgument($arg_value, $arg_type)
     {
 
-        if(empty($this->_value) || !in_array($arg_type, [self::VARIABLE, self::TXT])){
+        if(empty($this->_value) || !($arg_type === self::VARIABLE || $arg_type === self::TXT)){
             $this->throwException('There is no function to add an argument "' . $arg_value . '".');
         }
         $func = &$this->_value[count($this->_value) - 1];

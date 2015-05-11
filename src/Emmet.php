@@ -51,6 +51,8 @@ class Emmet
             $str = '';
             $i = 0;
             $length = strlen($emmet_string) - 1;
+            $attrs_states = [FSM::ID, FSM::CLASS_NAME, FSM::ATTR];
+            $states_to_save = [FSM::OPERATOR, FSM::ARG_TXT, FSM::TAG];
 
             while (FSM::END !== $fsm->getState()) {
                 if ($i > $length) {
@@ -82,7 +84,7 @@ class Emmet
                     $prev_state = $fsm->getPrevState();
                     $global_state = $fsm->getGlobalState();
 
-                    switch ($fsm->getPrevState()) {
+                    switch ($prev_state) {
                         case FSM::TAG:
                             if('' !== $str && $str !== ' '){
                                 $value->addText($str);
@@ -90,16 +92,18 @@ class Emmet
                             $node->setTag($value);
                             break;
                         case FSM::OPERATOR:
-                            if (!in_array($emmet_string[$i - 2], array('^', ')')) && '(' !== $str) {
+                            $prev_sym = $emmet_string[$i - 2];
+                            if (($prev_sym !== '^' && $prev_sym !== ')')&& '(' !== $str) {
                                 $pn->setOperand($node);
                                 $node = new Node();
                             }
-                            if (true !== ($pn_operator_status = $pn->setOperator($str))) {
-                                $this->throwException($pn_operator_status . ' ' . $this->getCheckTheDocumentation($i));
-                            }
+                            $pn->setOperator($str);
+//                            if (true !== ($pn_operator_status = $pn->setOperator($str))) {
+//                                $this->throwException($pn_operator_status . ' ' . $this->getCheckTheDocumentation($i));
+//                            }
                             break;
                         case FSM::ID:
-                            if('' !== $str && $str !== ' '){
+                            if('' !== $str){
                                 $value->addText(' id='.$str);
                             }
                             $node->addAttributes($value);
@@ -109,7 +113,7 @@ class Emmet
                             $node->addAttributes($value);
                             break;
                         case FSM::ATTR:
-                            if('' !== $str && $str !== ' '){
+                            if('' !== $str){
                                 $value->addText(' '.$str);
                             }
                             $node->addAttributes($value);
@@ -145,12 +149,12 @@ class Emmet
                         case FSM::ARGS:
                             break;
                         case FSM::ARG_TXT:
-                            if('' !== $str && ' ' !== $str){
+                            if('' !== $str){
                                 $value->addArgument($str, Value::TXT);
                             }
                             break;
                         case FSM::ARG_VAR:
-                            if('' !== $str && ' ' !== $str){
+                            if('' !== $str){
                                 $value->addArgument($str, Value::VARIABLE);
                             }
                             break;
@@ -163,20 +167,19 @@ class Emmet
                             break;
                     }
                         //echo getStateName($state) . ' - ' . getStateName($prev_state) . '<br>';
-                    $attrs_states = [FSM::ID, FSM::CLASS_NAME, FSM::ATTR];
                     if(
-                        (FSM::ARG_TXT === $state || FSM::ARGS === $state || FSM::ARG_VAR === $state) ||
-                        (FSM::ARG_TXT === $prev_state || FSM::ARGS === $prev_state || FSM::ARG_VAR === $prev_state) ||
-                        ($prev_state === FSM::VARIABLE || $prev_state === FSM::FUNC) ||
                         (in_array($state, $attrs_states) && in_array($prev_state, $attrs_states)) ||
-                        ((FSM::VARIABLE === $state || FSM::FUNC === $state) && FSM::HTML !== $global_state && FSM::TEXT !== $global_state )){
+                        ($prev_state === FSM::VARIABLE || $prev_state === FSM::FUNC) ||
+                        ((FSM::VARIABLE === $state || FSM::FUNC === $state) && FSM::HTML !== $global_state && FSM::TEXT !== $global_state ) ||
+                        (FSM::ARG_TXT === $state || FSM::ARGS === $state || FSM::ARG_VAR === $state) ||
+                        (FSM::ARG_TXT === $prev_state || FSM::ARGS === $prev_state || FSM::ARG_VAR === $prev_state)
+                    ){
                     } else {
                         $value = new Value($this->_data);
                     }
-                    if (FSM::END === $fsm->getState() && FSM::OPERATOR !== $fsm->getPrevState()) {
-                        $pn->setOperand($node);
-                    }
-                    if(in_array($fsm->getState(), [FSM::OPERATOR, FSM::ARG_TXT, FSM::TAG]) && $symbol !== '`' && $symbol !== '%'){
+
+
+                    if(($state == FSM::OPERATOR || $state === FSM::TAG || $state === FSM::ARG_TXT) && $symbol !== '`' && $symbol !== '%'){
                         $str = $symbol;
                     } else {
                         $str = '';
@@ -189,11 +192,15 @@ class Emmet
                 ++$i;
             }
 
+            if (FSM::END === $fsm->getState() && FSM::OPERATOR !== $fsm->getPrevState()) {
+                $pn->setOperand($node);
+            }
+
             $tree = $pn->generateTree();
             if ($tree instanceof Node) {
                 $this->_tree = $tree;
             } else {
-                $this->throwException($tree);
+                throw new \Exception($tree);
             }
         } catch(\Exception $e){
             $this->throwException($e->getMessage());
