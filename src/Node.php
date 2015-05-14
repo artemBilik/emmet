@@ -158,11 +158,13 @@ class Node extends Tree
     private $_tag = '';
     private $_value = '';
     private $_attributes = '';
+    private $_id = '';
+    private $_class = '';
     private $_multiplication = 1;
     private $_number = 0;
     private $_minimized = false;
 
-    private static $_self_closing_tags  = '%hr%br%input%link%meta%img';
+    private static $_self_closing_tags  = '%hr%br%input%link%meta%img%';
 
     public function __construct($type = self::TAG)
     {
@@ -208,6 +210,24 @@ class Node extends Tree
         $this->_attributes = $attributes;
 
     }
+    /**
+     * @param Value $id
+     */
+    public function addId(Value $id)
+    {
+
+        $this->_id = $id;
+
+    }
+    /**
+     * @param Value $class
+     */
+    public function addClass(Value $class)
+    {
+
+        $this->_class = $class;
+
+    }
 
     /**
      * @param Value $value
@@ -230,17 +250,16 @@ class Node extends Tree
     /**
      * @param $number
      */
-    public function setMultiplication($number)
+    public function setMultiplication(Value $number)
     {
 
-        $number = intval($number);
-        $this->_multiplication = ($number < 1) ? 1 : $number;
+        $this->_multiplication = $number;
 
     }
     public function getNumber()
     {
 
-        return $this->_number;
+        return $this->get('multiplication');
 
     }
     private function setNumber($number)
@@ -249,15 +268,16 @@ class Node extends Tree
         $this->_number = intval($number);
 
     }
-    public function getHtml()
+    public function getHtml($number = 0)
     {
 
+        $this->setNumber($number);
         if(self::TAG === $this->_type){
-            return $this->getHtmlForTag();
+            return $this->getHtmlForTag($number);
         } elseif(self::HTML === $this->_type){
-            return $this->getHtmlForHtml();
+            return $this->getHtmlForHtml($number);
         } elseif(self::TEXT_NODE === $this->_type) {
-            return $this->getHtmlForTextNode();
+            return $this->getHtmlForTextNode($number);
         } elseif(self::ROOT === $this->_type) {
             return $this->getHtmlForRoot();
         } else {
@@ -266,12 +286,13 @@ class Node extends Tree
 
     }
 
-    private function getHtmlForTag()
+    private function getHtmlForTag($number)
     {
 
         $result = '';
-        for($i = 0; $i < $this->_multiplication; $i++){
-            if(1 !== $this->_multiplication) {
+        $multiplication = $this->get('multiplication');
+        for($i = 0; $i < $multiplication; $i++){
+            if(1 < $multiplication) {
                 $this->setNumber($i);
             }
             $tag = $this->get('tag');
@@ -281,8 +302,7 @@ class Node extends Tree
                 $value = '';
                 $first_child = $this->getFirstChild();
                 if($first_child){
-                    $first_child->setNumber($i);
-                    $value .= $first_child->getHtml();
+                    $value .= $first_child->getHtml($this->_number);
                 }
                 $html = $this->closingElement($tag, $value);
                 $result .= $html;
@@ -291,25 +311,26 @@ class Node extends Tree
 
         $right_sibling = $this->getRightSibling();
         if($right_sibling){
-            $result .= $right_sibling->getHtml();
+            $result .= $right_sibling->getHtml($number);
         }
 
         return $result;
 
     }
-    private function getHtmlForHtml()
+    private function getHtmlForHtml($number)
     {
 
         $result = '';
-        for($i = 0; $i < $this->_multiplication; ++$i){
-            if(1 !== $this->_multiplication){
+        $multiplication = $this->get('multiplication');
+        for($i = 0; $i < $multiplication; ++$i){
+            if(1 < $multiplication){
                 $this->setNumber($i);
             }
             $value = '';
             $first_child = $this->getFirstChild();
             if($first_child){
                 $first_child->setNumber($i);
-                $value .= $first_child->getHtml();
+                $value .= $first_child->getHtml($this->_number);
             }
 
             $html = $this->get('value', $value);
@@ -318,24 +339,26 @@ class Node extends Tree
         }
         $right_sibling = $this->getRightSibling();
         if($right_sibling){
-            $result .= $right_sibling->getHtml();
+            $result .= $right_sibling->getHtml($number);
         }
         return $result;
 
     }
-    private function getHtmlForTextNode()
+    private function getHtmlForTextNode($number)
     {
 
         $result = '';
-        for($i = 0; $i < $this->_multiplication; ++$i){
-            if(1 !== $this->_multiplication){
+        $multiplication = $this->get('multiplication');
+        for($i = 0; $i < $multiplication; ++$i){
+            if(1 < $multiplication){
                 $this->setNumber($i);
             }
+
             $result .= $this->get('value');
         }
         $right_sibling = $this->getRightSibling();
         if($right_sibling){
-            return $result . $right_sibling->getHtml();
+            return $result . $right_sibling->getHtml($number);
         }
 
         return $result;
@@ -346,7 +369,7 @@ class Node extends Tree
 
         $first_child = $this->getFirstChild();
         if(null != $first_child){
-            return $first_child->getHtml();
+            return $first_child->getHtml(0);
         }
 
     }
@@ -369,6 +392,14 @@ class Node extends Tree
     {
 
         $attributes = [];
+        $id = $this->get('id');
+        if($id){
+            $attributes['id'] = $id;
+        }
+        $class = $this->get('class');
+        if($class){
+            $attributes['class'] = $class;
+        }
         foreach(explode(' ', $this->get('attributes')) as $attr){
             $attr = explode('=', $attr);
             if('class' === $attr[0]){
@@ -399,13 +430,12 @@ class Node extends Tree
 
         $var = '_'.$var;
         if($this->$var instanceof Value){
-            return $this->$var->get($this->_number, $value);
-//            $value = $this->$var->get($this->_number, $value);
-//            if(false === $this->_minimized){
-//                $this->$var = $this->$var->getToSet();
-//                $this->_minimized = true;
-//            }
-//            return $value;
+            $value = $this->$var->get($this->_number, $value);
+            if(false === $this->_minimized){
+                $this->$var = $this->$var->getToSet();
+                $this->_minimized = true;
+            }
+            return $value;
         } else {
             return $this->$var;
         }
