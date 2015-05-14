@@ -123,10 +123,8 @@ class Emmet
                         case FSM::ID:
                             $value->addText($str);
                             if(2 !== $state_num){
-                                $node->addAttributes($value);
-                                if(!(3 === $state_num || 4 === $state_num)){
-                                    $value = new Value($this->_data);
-                                }
+                                $node->addId($value);
+                                $value = new Value($this->_data);
                             }
                             break;
                         case FSM::ID_VAR:
@@ -150,10 +148,8 @@ class Emmet
                         case FSM::CLASS_NAME:
                             $value->addText($str);
                             if(3 !== $state_num){
-                                $node->addAttributes($value);
-                                if(4 !== $state_num){
-                                    $value = new Value($this->_data);
-                                }
+                                $node->addClass($value);
+                                $value = new Value($this->_data);
                             }
                             break;
                         case FSM::CLASS_NAME_VAR:
@@ -254,10 +250,8 @@ class Emmet
                         case FSM::MULTI:
                             $value->addText($str);
                             if(7 !== $state_num){
-                                $node->setMultiplication($value->getToSet());
-                                if(7 !== $state_num){
-                                    $value = new Value($this->_data);
-                                }
+                                $node->setMultiplication($value);
+                                $value = new Value($this->_data);
                             }
                             break;
                         case FSM::MULTI_VAR:
@@ -309,16 +303,10 @@ class Emmet
                             FSM::OPERATOR === $state || FSM::TAG === $state || FSM::HTML_ARG_TXT === $state ||
                             FSM::TEXT_ARG_TXT === $state || FSM::TEXT_NODE_ARG_TXT === $state ||
                             FSM::TAG_ARG_TXT === $state || FSM::ID_ARG_TXT === $state ||
-                            FSM::CLASS_NAME_ARG_TXT === $state || FSM::ATTR_ARG_TXT === $state)
+                            FSM::CLASS_NAME_ARG_TXT === $state || FSM::ATTR_ARG_TXT === $state || FSM::MULTI_ARG_TXT === $state)
                         && ('`' !== $symbol && '%' !== $symbol)
                     ){
                         $str = $symbol;
-                    } elseif(FSM::ID === $state && 2 !== $prev_state_num){
-                        $str = ' id=';
-                    } elseif(FSM::CLASS_NAME === $state && (3 !== $prev_state_num || FSM::CLASS_NAME === $prev_state)){
-                        $str = ' class=';
-                    } elseif(FSM::ATTR === $state && (4 !== $prev_state_num)){
-                        $str = ' ';
                     } else {
                         $str = '';
                     }
