@@ -80,3 +80,32 @@ Let's see.
 '(div>p>a>span)>p === '<div>' . <p><a><span></span></a></p>' . '<p></p>' . '</div>'
 'div>(div>p)^+div === '<div><div><p></div>' . '<div></div>'
 ```
+
+# Tags
+
+To create a tag you can use any character.
+```
+`div+h1` === '<div></div><h1></h1>'
+```
+You can see it in a previous section.
+You can add an id to your tag with "#"
+```
+'div#myDiv' = '<div id="myDiv></div>'
+```
+You can add a class with "."
+Use " " to add more than one class
+```
+'div.class1+civ.class1 class2' === '<div class="class1"></div><div class="class1 class2"></div>'
+```
+To add any other attribute use "[ ]" 
+```
+'option[value=12 selected]' === '<option value="12" selected="selected"></option>'
+```
+To add a text inside your tag use "{ }"
+```
+'p{some text}' === '<p>some text</p>'
+```
+If you need more than one elements use multiplication by "*"
+```
+'p*2' === '<p></p><p></p>'
+```
