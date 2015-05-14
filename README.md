@@ -53,7 +53,7 @@ echo (new Emmet(
 So we have Operations and Tags, Text Nodes and Html elements.
  # Operations
  
-> + ^ ( )
+( ) ^ > +
  
 Use "+" operation to add sibling to previous elements
 
