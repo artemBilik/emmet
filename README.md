@@ -53,7 +53,7 @@ echo (new Emmet(
 So we have Operations and Tags, Text Nodes and Html elements.
  # Operations
  
- + > ^ ( )
+> + ^ ( )
  
 Use "+" operation to add sibling to previous elements
 
@@ -66,3 +66,9 @@ Use ">" operation to add child to previous element
 ```
 'a>span' === '<a><span></span></a>'
 ```
+
+Use "^" operation to climb up on the tree
+```
+'p>a>img^+span' === '<p><a><img /></a><span></span></p>'
+```
+
