@@ -109,3 +109,22 @@ If you need more than one elements use multiplication by "*"
 ```
 'p*2' === '<p></p><p></p>'
 ```
+
+# Text Node
+
+You can create a text node without any tag.
+And use it like other element with "+" operation. But you cann't add a child element to text node.
+```
+'p+{ some text }+a' === '<p></p> some text <a></a>'
+'p+{ some text }*2' === '<p></p some text  some text'
+```
+
+# Variables
+
+You can use a variables in your string with " ` ".
+
+```
+(new Emmet('p.`info_class`{`information`}+span'))->create([ 'information' => 'some information for user', 'info_class' => 'info']) 
+ === '<p class="info">some information for user</p><span></span>'
+ '<p>some information for user</p><
+
