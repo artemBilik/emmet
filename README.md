@@ -71,4 +71,11 @@ Use "^" operation to climb up on the tree
 ```
 'p>a>img^+span' === '<p><a><img /></a><span></span></p>'
 ```
-
+Use "( )" operations for groupping elements
+Should to know that next after ")" operation will use the first element in the brackets.
+Let's see.
+```
+'(div>p+a)+div' === '<div><p></p><a></a></div>' . '<div></div'
+'(div>p>a>span)>p === '<div>' . <p><a><span></span></a></p>' . '<p></p>' . '</div>'
+'div>(div>p)^+div === '<div><div><p></div>' . '<div></div>'
+```
