@@ -29,7 +29,7 @@ Simple Usage
   
 ```
   foreach($data as $value){
-      echo (new Emmet('tr>td{`value`}))->create([ 'value' => $value ]);
+      echo (new Emmet('tr>td{`value`}'))->create([ 'value' => $value ]);
   }
 ```
    Because it's work like prepared Statement in PDO.<br />
@@ -39,9 +39,11 @@ Simple Usage
 Best practice to create a table html element is
 ```
 echo (new Emmet(
-          'table#myTable>tbody>tr.myTr*`tr_cnt`>td.title{`data[$][title]`}+td{`data[$][value]`}'
-  ))->create([ 
-          'data' => $data, 
-          'tr_cnt' => count($data), 
-  )]);
+    'table#myTable>tbody>tr.myTr*`tr_cnt`>td.title{`data[$][title]`}+td{`data[$][value]`}')
+)->create(
+    ['data' => $data,'tr_cnt' => count($data),]
+);
+
 ```
+
+# Detail usage
