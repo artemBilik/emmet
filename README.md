@@ -121,10 +121,30 @@ And use it like other element with "+" operation. But you cann't add a child ele
 
 # Variables
 
-You can use a variables in your string with " ` ".
+You can use a variables like a value of your id, classes, text nodes, or multiplication in your string with " ` ".
 
 ```
 (new Emmet('p.`info_class`{`information`}+span'))->create([ 'information' => 'some information for user', 'info_class' => 'info']) 
  === '<p class="info">some information for user</p><span></span>'
- '<p>some information for user</p><
+ ```
+ You have a special variable "$". which represent a number of your element. the number of element is 0.
+ But if you use a multiplication for your element it will change.
+ ```
+ echo (new Emmet('ul>li{`ul[$]`}*2))->create(['ul' => [1,2,3]]) === '<ul><li>1</li><li>2</li></ul>'
+ ```
+ Or if parent element has an multiplication than the child will have the same multiplication
+ ```
+echo (new Emmet(
+    'table#myTable>tbody>tr.myTr*`tr_cnt`>td.title{`data[$][title]`}+td{`data[$][value]`}')
+)->create(
+    ['data' => $data,'tr_cnt' => count($data),]
+);
+```
+
+You can use an object in your variable by '.'
+```
+
+echo (new Emmet())
+
+```
 
