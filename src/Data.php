@@ -48,19 +48,19 @@ class Data
                         if(isset($memory->$value)){
                             $memory = $memory->$value;
                         } else {
-                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                            $this->throwException('Cann\'t find the variable "' . substr($variable, 0, strlen($variable) - 1) . '".');
                         }
                     } elseif('{' === $state){
                         if(isset($memory{$value})){
                             $memory = $memory{$value};
                         } else {
-                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                            $this->throwException('Cann\'t find the variable "' . substr($variable, 0, strlen($variable) - 1) . '".');
                         }
                     } else {
                         if(isset($memory[$value])){
                             $memory = $memory[$value];
                         } else {
-                            $this->throwException('Cann\'t find the variable "' . $variable . '".');
+                            $this->throwException('Cann\'t find the variable "' . substr($variable, 0, strlen($variable) - 1) . '".');
                         }
                     }
                 }
