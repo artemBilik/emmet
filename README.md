@@ -87,7 +87,6 @@ To create a tag you can use any character.
 ```
 `div+h1` === '<div></div><h1></h1>'
 ```
-You can see it in a previous section.
 You can add an id to your tag with "#"
 ```
 'div#myDiv' = '<div id="myDiv></div>'
