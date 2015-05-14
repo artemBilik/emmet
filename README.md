@@ -47,3 +47,22 @@ echo (new Emmet(
 ```
 
 # Detail usage
+
+[operation] [ tag[id][class][attributes][element text node][multiplication] ] | [ html[multiplication] ] | [ text_node[multiplication] ] [operation]
+
+So we have Operations and Tags, Text Nodes and Html elements.
+ # Operations
+ 
+ + > ^ ( )
+ 
+Use "+" operation to add sibling to previous elements
+
+```
+'a+span'  ==== '<a></a><span></span>'
+```
+
+Use ">" operation to add child to previous element
+
+```
+'a>span' === '<a><span></span></a>'
+```
