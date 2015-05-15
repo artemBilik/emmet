@@ -13,7 +13,7 @@ Emmet::create(array data)
 
 Simple Usage
 ``````````
-  (new Emmet('div>p>span+a>img[src=/img.jpg]))->create();
+  (new Emmet('div>p>span+a>img[src=/img.jpg]'))->create();
 ```
    OR
 
