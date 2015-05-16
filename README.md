@@ -14,7 +14,7 @@ Emmet::addFunctions(array functions);
 
 Simple Usage
 ``````````
-  (new Emmet('div>p>span+a>img[src=/img.jpg]'))->create();
+  (new Emmet('div>p>span+a>img[src=img.jpg]'))->create();
 ```
    OR
 
@@ -42,7 +42,7 @@ Best practice to create a table html element is
 echo (new Emmet(
     'table#myTable>tbody>tr.myTr*`tr_cnt`>td.title{`data[$][title]`}+td{`data[$][value]`}')
 )->create(
-    ['data' => $data,'tr_cnt' => count($data),]
+    ['data' => [['title' => 't1', 'value' => 'v1'], ['title' => 't2', 'value' => 'v2'], ['title' => 't3', 'value' => 'v3']], 'tr_cnt' => 3]
 );
 
 ```
@@ -77,9 +77,9 @@ Use "( )" operations for groupping elements
 Should to know that next after ")" operation will use the first element in the brackets.
 Let's see.
 ```
-'(div>p+a)+div' === '<div><p></p><a></a></div>' . '<div></div'
-'(div>p>a>span)>p === '<div>' . <p><a><span></span></a></p>' . '<p></p>' . '</div>'
-'div>(div>p)^+div === '<div><div><p></div>' . '<div></div>'
+'(div>p+a)+div' === '<div><p></p><a></a></div>' . '<div></div>'
+'(div>p>a>span)>p' === '<div>' . <p><a><span></span></a></p>' . '<p></p>' . '</div>'
+'div>(div>p)^+div' === '<div><div><p></p></div></div>' . '<div></div>'
 ```
 
 # Tags
@@ -90,12 +90,12 @@ To create a tag you can use any character.
 ```
 You can add an id to your tag with "#"
 ```
-'div#myDiv' = '<div id="myDiv></div>'
+'div#myDiv>span' = '<div id="myDiv"><span></span></div>'
 ```
 You can add a class with "."
 Use " " to add more than one class
 ```
-'div.class1+civ.class1 class2' === '<div class="class1"></div><div class="class1 class2"></div>'
+'div.class1+div.class1 class2' === '<div class="class1"></div><div class="class1 class2"></div>'
 ```
 To add any other attribute use "[ ]" 
 ```
@@ -116,7 +116,7 @@ You can create a text node without any tag.
 And use it like other element with "+" operation. But you cann't add a child element to text node.
 ```
 'p+{ some text }+a' === '<p></p> some text <a></a>'
-'p+{ some text }*2' === '<p></p some text  some text'
+'p+{ some text }*2' === '<p></p> some text  some text '
 ```
 
 # Variables
