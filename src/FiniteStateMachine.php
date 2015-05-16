@@ -1171,10 +1171,10 @@ class FiniteStateMachine
      * @param int $state
      * @throws \Exception
      */
-    public function __construct($state = 0)
+    public function __construct($state = null)
     {
 
-        if(0 === $state){
+        if(null === $state){
             $state = self::TAG;
         }
         if(!in_array($state, self::$_initial_states)){
