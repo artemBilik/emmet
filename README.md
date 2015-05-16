@@ -159,7 +159,7 @@ Emmet::addFunctions(['funcName' => function() { return 'funcName';}])
 After this you can call it inside your emmet string by using " % ".
 
 ```
-echo (new Emmet('p%funcName()%'))->create() === '<p>funcName</p>'
+echo (new Emmet('p{%funcName()%}'))->create() === '<p>funcName</p>'
 ```
 You can pass an arguments in your function
 ```
