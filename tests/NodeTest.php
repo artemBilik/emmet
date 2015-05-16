@@ -122,10 +122,13 @@ class NodeTest extends \PHPUnit_Framework_TestCase
         $value->addText('alone');
         $sibling->addAttributes($value);
 
-        $sibling->setMultiplication(2);
+        $value = new Value(new Data());
+        $value->addText('2');
+
+        $sibling->setMultiplication($value);
 
 
-        $html = '<header class="headerClass1 headerClass2" id="headerId" color="red" >text node of the child nodeone more text node of the child node<hr alone="alone" /></header><section alone="alone" >text node of the sibling node</section><section alone="alone" >text node of the sibling node</section>';
+        $html = '<header class="headerClass1 headerClass2" id="headerId" color="red">text node of the child nodeone more text node of the child node<hr alone="alone" /></header><section alone="alone">text node of the sibling node</section><section alone="alone">text node of the sibling node</section>';
         $this->assertEquals($node->getHtml(), $html);
 
     }
@@ -139,7 +142,9 @@ class NodeTest extends \PHPUnit_Framework_TestCase
         $value = new Value(new Data());
         $value->addText('text node');
         $tn->setValue($value);
-        $tn->setMultiplication(2);
+        $value  = new Value(new Data());
+        $value->addText('2');
+        $tn->setMultiplication($value);
 
         $this->assertEquals($tn->getHtml(), 'text nodetext node');
 
