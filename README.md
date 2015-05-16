@@ -153,7 +153,27 @@ echo (new Emmet('article{`object.title`}'))->create(['object' => new Object(])])
 You can use a function in your emmet string.
 At first you must add a function.
 ```
-Emmet::addFunctions(['funcName' => function($a, $b) { return $a .' ' . $b;}])
+Emmet::addFunctions(['funcName' => function() { return 'funcName';}])
 ```
 
+After this you can call it inside your emmet string by using " % ".
 
+```
+echo (new Emmet('p%funcName()%'))->create() === '<p>funcName</p>'
+```
+You can pass an arguments in your function
+```
+Emmet::addFUnctions(['funcName' => function($arg1, $arg2) { return ' ' . $arg . ' '; }])
+```
+ Pass the text as argument
+```
+echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
+```
+ Pass the variable as argument
+ ```
+ echo (new Emmet('p{%funcName(`arg`)%}'))->create(['arg' => 'arg value']) === '<p> arg value </p>'
+ ```
+ And you can pass more than one argument
+ ```
+ Emmet::addFunctions('func' => function($a, $b, $c) { return $a.$b.$c; });
+ echo (new Emmet('p{%func(`a`, b, `c`)%}'))->create(['a' => 'aaa', 'c' => 'ccc']) === '<p>aaabccc</p>'
