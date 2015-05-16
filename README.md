@@ -130,7 +130,7 @@ You can use a variables like a value of your id, classes, text nodes, or multipl
  You have a special variable "$". which represent a number of your element. the number of element is 0.
  But if you use a multiplication for your element it will change.
  ```
- echo (new Emmet('ul>li{`ul[$]`}*2))->create(['ul' => [1,2,3]]) === '<ul><li>1</li><li>2</li></ul>'
+ echo (new Emmet('ul>li{`ul[$]`}*2'))->create(['ul' => [1,2,3]]) === '<ul><li>1</li><li>2</li></ul>'
  ```
  Or if parent element has an multiplication than the child will have the same multiplication
  ```
@@ -163,7 +163,7 @@ echo (new Emmet('p{%funcName()%}'))->create() === '<p>funcName</p>'
 ```
 You can pass an arguments in your function
 ```
-Emmet::addFUnctions(['funcName' => function($arg1, $arg2) { return ' ' . $arg . ' '; }])
+Emmet::addFUnctions(['funcName' => function($arg) { return ' ' . $arg . ' '; }])
 ```
  Pass the text as argument
 ```
@@ -175,14 +175,14 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  ```
  And you can pass more than one argument
  ```
- Emmet::addFunctions('func' => function($a, $b, $c) { return $a.$b.$c; });
+ Emmet::addFunctions(['func' => function($a, $b, $c) { return $a.$b.$c; }]);
  echo (new Emmet('p{%func(`a`, b, `c`)%}'))->create(['a' => 'aaa', 'c' => 'ccc']) === '<p>aaabccc</p>'
  ```
  
  Your function can be a string
  ```
  Emmet::addFunctions(['infoHeader' => 'Information header'])
- echo (new Emmet('div>header{%infoHeader()%}+section{some info}')) === '<div><header>Information header</header><section>some info</section></div>'
+ echo (new Emmet('div>header{%infoHeader()%}+section{some info}'))-create() === '<div><header>Information header</header><section>some info</section></div>'
  ```
  
  # Combine value
@@ -191,7 +191,7 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  With strings variables and functions.
  
  ```
- echo (new Emmet('p#identifier_`$`{the value of node is %getValue(`value[$]`)%, the number of node is `$`}*%count(`value`)%'))->create(['value` => [0,10,20,30,40,50]]) === '<p id="identifier_0">the value of node is 0, the number of node is 0 </p>...<p id="identifier_5">the value of node is 50, the number of node is 5</p>'
+ echo (new Emmet('p#identifier_`$`{the value of node is %getValue(`value[$]`)%, the number of node is `$`}*%count(`value`)%'))->create(['value' => [0,10,20,30,40,50]]) === '<p id="identifier_0">the value of node is 0, the number of node is 0 </p>...<p id="identifier_5">the value of node is 50, the number of node is 5</p>'
  ```
  
 # HTML Node
@@ -201,8 +201,8 @@ You can add the value of the html node inside tag or another html node or siblin
 
 
 ```
-Emmet::addFunctions(['htmlFunction' => function(){ return 'function html node'}])
-echo (new Emmet('div>`htmlVar'+%htmlFunction()%))->create(['htmlVar' => 'variable html node']) === '<div>variable html nodefunction html node</div>'
+Emmet::addFunctions(['htmlFunction' => function(){ return 'function html node';}])
+echo (new Emmet('div>`htmlVar`+%htmlFunction()%'))->create(['htmlVar' => 'variable html node']) === '<div>variable html nodefunction html node</div>'
 ```
 
 Or you can add another nodes to html node.
@@ -217,7 +217,7 @@ Emmet::addFunction(['oneMoreP' => '<p class="one more p">{{value}}</p>']);
 
 echo (new Emmet('div>%oneMoreP()%>`myP`>a+a'))->create(['myP' => '<p class="myP">{{value}}</p>']) === '<div><p class="one more p"><p class="myP"><a></a><a></a></p></p></div>'
 
-Emmet::addFunction(['someFunc' => function($first, $second, $value) { return $first.' '.$second.' '.$value; }]);
+Emmet::addFunction(['func' => function($first, $second, $value) { return $first.' '.$second.' '.$value; }]);
 
 echo (new Emmet('div>%func(first, `second`)%>`second`+a'))->create(['second' => 'second']) === 
 '<div>first second second<a></a></div>'
