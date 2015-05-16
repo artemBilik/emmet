@@ -377,14 +377,14 @@ class Node extends Tree
     private function closingElement($tag, $value)
     {
 
-        return "<" . $tag . " " . $this->getAttributes() . ">" . $value . "</" . $tag . ">";
+        return "<" . $tag . $this->getAttributes() . ">" . $value . "</" . $tag . ">";
 
     }
 
     private function selfClosingElement($tag)
     {
 
-        return "<" . $tag . " " . $this->getAttributes() . "/>";
+        return "<" . $tag . $this->getAttributes() . " />";
 
     }
 
@@ -417,9 +417,8 @@ class Node extends Tree
 
         $attr_str = '';
         foreach($attributes as $key => $attr){
-            $attr_str .= $key . '="' . $attr . '" ';
+            $attr_str .= ' ' . $key . '="' . $attr . '"';
         }
-
         return $attr_str;
 
     }
