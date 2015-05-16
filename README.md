@@ -3,8 +3,9 @@ Emmet for php
 # Interface
 ````
 
-Emmet::__construct( string emmet_string )
-Emmet::create(array data)
+Emmet::__construct( string emmet_string );
+Emmet::create(array data);
+Emmet::addFunctions(array functions);
 
 ````
 
@@ -143,7 +144,16 @@ echo (new Emmet(
 You can use an object in your variable by '.'
 ```
 
-echo (new Emmet())
+echo (new Emmet('article{`object.title`}'))->create(['object' => new Object(])]);
 
 ```
+
+# Functions
+
+You can use a function in your emmet string.
+At first you must add a function.
+```
+Emmet::addFunctions(['funcName' => function($a, $b) { return $a .' ' . $b;}])
+```
+
 
