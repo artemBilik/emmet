@@ -177,3 +177,50 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  ```
  Emmet::addFunctions('func' => function($a, $b, $c) { return $a.$b.$c; });
  echo (new Emmet('p{%func(`a`, b, `c`)%}'))->create(['a' => 'aaa', 'c' => 'ccc']) === '<p>aaabccc</p>'
+ ```
+ 
+ Your function can be a string
+ ```
+ Emmet::addFunctions(['infoHeader' => 'Information header'])
+ echo (new Emmet('div>header{%infoHeader()%}+section{some info}')) === '<div><header>Information header</header><section>some info</section></div>'
+ ```
+ 
+ # Combine value
+ 
+ You can combine value of your tag or id or class etc...
+ With strings variables and functions.
+ 
+ ```
+ echo (new Emmet('p#identifier_`$`{the value of node is %getValue(`value[$]`)%, the number of node is `$`}*%count(`value`)%'))->create(['value` => [0,10,20,30,40,50]]) === '<p id="identifier_0">the value of node is 0, the number of node is 0 </p>...<p id="identifier_5">the value of node is 50, the number of node is 5</p>'
+ ```
+ 
+# HTML Node
+
+HTML it is a Node of your html tree, and the value of this node is variable or function.
+You can add the value of the html node inside tag or another html node or sibling it.
+
+
+```
+Emmet::addFunctions(['htmlFunction' => function(){ return 'function html node'}])
+echo (new Emmet('div>`htmlVar'+%htmlFunction()%))->create(['htmlVar' => 'variable html node']) === '<div>variable html nodefunction html node</div>'
+```
+
+Or you can add another nodes to html node.
+If you use a variable or your function is a string use '{{value}}' in your string.
+If you use a callable function use the last arg in your function
+
+```
+
+echo (new Emmet('div+`myP`>a+span'))->create(['myP' => '<p class="myP">{{value}}</p>']) === '<div></div><p class="myP"><a></a><span></span></p>'
+
+Emmet::addFunction(['oneMoreP' => '<p class="one more p">{{value}}</p>']);
+
+echo (new Emmet('div>%oneMoreP()%>`myP`>a+a'))->create(['myP' => '<p class="myP">{{value}}</p>']) === '<div><p class="one more p"><p class="myP"><a></a><a></a></p></p></div>'
+
+Emmet::addFunction(['someFunc' => function($first, $second, $value) { return $first.' '.$second.' '.$value; }]);
+
+echo (new Emmet('div>%func(first, `second`)%>`second`+a'))->create(['second' => 'second']) === 
+'<div>first second second<a></a></div>'
+
+```
+
