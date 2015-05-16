@@ -32,6 +32,12 @@ class Data
     public function get($variable, $number, $added_value)
     {
 
+        if('$' === $variable){
+            if(isset($this->_data[$number])){
+                return $this->_data[$number];
+            }
+            return $number;
+        }
         $memory = $this->_data;
         $variable .= ';';
         $state = '[';
