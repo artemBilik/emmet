@@ -1,5 +1,12 @@
-# emmet
+# Description
 Emmet implementation for php
+# Installation
+Add 
+```
+"artem_c/emmet": "dev-master"
+```
+to the require section of your composer.json file.
+
 # Interface
 ````
 
