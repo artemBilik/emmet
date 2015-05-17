@@ -1,6 +1,6 @@
 <?php
 
-namespace emmet;
+namespace artem_c\emmet;
 
 class PolishNotation
 {

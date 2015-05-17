@@ -1,9 +1,9 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\Node as Node;
-use \emmet\Value as Value;
-use \emmet\Data as Data;
+use \artem_c\emmet\Node as Node;
+use \artem_c\emmet\Value as Value;
+use \artem_c\emmet\Data as Data;
 
 require_once __DIR__ . '/../src/Node.php';
 require_once __DIR__ . '/../src/Value.php';
@@ -18,7 +18,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
 
         $node = new Node();
 
-        $class = new \ReflectionClass('\emmet\Node');
+        $class = new \ReflectionClass('\artem_c\emmet\Node');
         $type = $class->getProperty('_type');
         $type->setAccessible(true);
 

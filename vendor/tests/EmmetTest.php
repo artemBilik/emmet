@@ -1,7 +1,7 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\Emmet as Emmet;
+use \artem_c\emmet\Emmet as Emmet;
 
 require_once __DIR__ . '/../src/Emmet.php';
 
@@ -11,12 +11,12 @@ class EmmetTest extends \PHPUnit_Framework_TestCase
     private $_emmet_string = 'div>p>span+a>span';
 
     /**
-     *  @expectedException \emmet\EmmetException
+     *  @expectedException \artem_c\emmet\EmmetException
      */
     public function testConstruct()
     {
 
-        $reflection_class = new \ReflectionClass('\emmet\Emmet');
+        $reflection_class = new \ReflectionClass('\artem_c\emmet\Emmet');
         $emmet_property = $reflection_class->getProperty('_emmet_string');
         $emmet_property->setAccessible(true);
 
@@ -29,10 +29,10 @@ class EmmetTest extends \PHPUnit_Framework_TestCase
         $emmet = new Emmet($this->_emmet_string);
         $this->assertEquals($this->_emmet_string, $emmet_property->getValue($emmet));
 
-        $this->assertInstanceOf('\emmet\Tree', $tree_property->getValue($emmet));
+        $this->assertInstanceOf('\artem_c\emmet\Tree', $tree_property->getValue($emmet));
         $this->assertTrue($tree_property->getValue($emmet)->isRoot());
 
-        $this->assertInstanceOf('\emmet\Data', $data_property->getValue($emmet));
+        $this->assertInstanceOf('\artem_c\emmet\Data', $data_property->getValue($emmet));
 
 
         new Emmet(new \stdClass());
@@ -44,7 +44,7 @@ class EmmetTest extends \PHPUnit_Framework_TestCase
 
         $emmet = new Emmet($this->_emmet_string);
 
-        $ref = new \ReflectionClass('\emmet\Emmet');
+        $ref = new \ReflectionClass('\artem_c\emmet\Emmet');
         $method = $ref->getMethod('getCheckTheDocumentation');
         $method->setAccessible(true);
 

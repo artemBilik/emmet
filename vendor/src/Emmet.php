@@ -1,8 +1,8 @@
 <?php
 
-namespace emmet;
+namespace artem_c\emmet;
 
-use emmet\FiniteStateMachine as FSM;
+use \artem_c\emmet\FiniteStateMachine as FSM;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "Node.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "FiniteStateMachine.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "PolishNotation.php";

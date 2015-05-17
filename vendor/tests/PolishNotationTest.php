@@ -1,10 +1,10 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\Node;
-use \emmet\PolishNotation;
-use \emmet\Value;
-use \emmet\Data;
+use \artem_c\emmet\Node;
+use \artem_c\emmet\PolishNotation;
+use \artem_c\emmet\Value;
+use \artem_c\emmet\Data;
 
 require_once __DIR__ . '/../src/Emmet.php';
 

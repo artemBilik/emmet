@@ -1,7 +1,7 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\FiniteStateMachine as FSM;
+use \artem_c\emmet\FiniteStateMachine as FSM;
 
 require_once __DIR__ . '/../src/Emmet.php';
 

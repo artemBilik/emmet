@@ -1,7 +1,7 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\Node as Node;
+use \artem_c\emmet\Node as Node;
 
 require_once __DIR__ . '/../src/Node.php';
 

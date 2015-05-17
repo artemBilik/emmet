@@ -1,8 +1,8 @@
 <?php
-namespace emmet\test;
+namespace artem_c\emmet\test;
 
-use \emmet\Data as Data;
-use \emmet\Value as Value;
+use \artem_c\emmet\Data as Data;
+use \artem_c\emmet\Value as Value;
 
 require_once __DIR__ . '/../src/Data.php';
 require_once __DIR__ . '/../src/Value.php';
