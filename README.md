@@ -1,5 +1,5 @@
 # emmet
-Emmet for php
+Emmet implementation for php
 # Interface
 ````
 
