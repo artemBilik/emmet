@@ -56,7 +56,7 @@ echo (new Emmet(
 
 # Detail usage
 
-[operation] [ tag[id][class][attributes][element text node][multiplication] ] | [ html[multiplication] ] | [ text_node[multiplication] ] [operation]
+[operation] [ tag [id] [class] [attributes] [element text node] [multiplication] ] | [ html [multiplication] ] | [ text_node [multiplication] ] [operation]
 
 So we have Operations and Tags, Text Nodes and Html elements.
 
