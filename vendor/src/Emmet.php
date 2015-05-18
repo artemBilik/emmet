@@ -3,12 +3,12 @@
 namespace artem_c\emmet;
 
 use \artem_c\emmet\FiniteStateMachine as FSM;
-require_once __DIR__ . DIRECTORY_SEPARATOR . "Node.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "FiniteStateMachine.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "PolishNotation.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "Data.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "EmmetException.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "Value.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "Node.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "FiniteStateMachine.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "PolishNotation.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "Data.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "EmmetException.php";
+//require_once __DIR__ . DIRECTORY_SEPARATOR . "Value.php";
 
 class Emmet
 {
@@ -44,10 +44,12 @@ class Emmet
 
         try {
             $emmet_string = 'root>' . $this->_emmet_string;
-            $pn = new PolishNotation();
-            $fsm = new FSM(FSM::TAG);
-            $node = new Node(Node::ROOT);
+
+            $pn    = new PolishNotation();
+            $fsm   = new FSM(FSM::TAG);
+            $node  = new Node(Node::ROOT);
             $value = new Value($this->_data);
+
             $str = '';
             $i = 0;
             $length = strlen($emmet_string) - 1;
@@ -69,9 +71,7 @@ class Emmet
                         continue;
                     }
                 }
-                
-                
-
+// @todo перенести обработку вниз
                 if (FSM::ERROR === $fsm->getState()) {
                     $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($i));
                 }
@@ -88,17 +88,15 @@ class Emmet
                     switch ($prev_state) {
                         case FSM::OPERATOR:
                             $prev_sym = $emmet_string[$i - 2];
-                            if (($prev_sym !== '^' && $prev_sym !== ')')&& '(' !== $str) {
+                            if (($prev_sym !== '^' && $prev_sym !== ')') && '(' !== $str) {
                                 $pn->setOperand($node);
                                 $node = new Node();
                             }
                             $pn->setOperator($str);
                             break;
-
-
                         case FSM::TAG:
                             $value->addText($str);
-                            if(1 !== $state_num){
+                            if (1 !== $state_num) {
                                 $node->setTag($value);
                                 $value = new Value($this->_data);
                             }
@@ -107,7 +105,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::TAG_FUNC:
-                            if(FSM::TAG !== $state){
+                            if (FSM::TAG !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -119,10 +117,9 @@ class Emmet
                         case FSM::TAG_ARG_VAR:
                             $value->addArgument($str, Value::VARIABLE);
                             break;
-                        
                         case FSM::ID:
                             $value->addText($str);
-                            if(2 !== $state_num){
+                            if (2 !== $state_num) {
                                 $node->addId($value);
                                 $value = new Value($this->_data);
                             }
@@ -131,7 +128,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::ID_FUNC:
-                            if(FSM::ID !== $state){
+                            if (FSM::ID !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -143,11 +140,9 @@ class Emmet
                         case FSM::ID_ARG_VAR:
                             $value->addArgument($str, Value::VARIABLE);
                             break;
-                        
-                        
                         case FSM::CLASS_NAME:
                             $value->addText($str);
-                            if(3 !== $state_num){
+                            if (3 !== $state_num) {
                                 $node->addClass($value);
                                 $value = new Value($this->_data);
                             }
@@ -156,7 +151,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::CLASS_NAME_FUNC:
-                            if(FSM::CLASS_NAME !== $state){
+                            if (FSM::CLASS_NAME !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -168,8 +163,6 @@ class Emmet
                         case FSM::CLASS_NAME_ARG_VAR:
                             $value->addArgument($str, Value::VARIABLE);
                             break;
-                        
-                        
                         case FSM::ATTR:
                             $value->addText($str);
                             break;
@@ -177,7 +170,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::ATTR_FUNC:
-                            if(FSM::ATTR !== $state){
+                            if (FSM::ATTR !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -193,9 +186,6 @@ class Emmet
                             $node->addAttributes($value);
                             $value = new Value($this->_data);
                             break;
-                        
-                        
-                        
                         case FSM::TEXT:
                             $value->addText($str);
                             break;
@@ -203,7 +193,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::TEXT_FUNC:
-                            if(FSM::TEXT !== $state){
+                            if (FSM::TEXT !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -219,8 +209,6 @@ class Emmet
                             $node->setValue($value);
                             $value = new Value($this->_data);
                             break;
-                        
-                        
                         case FSM::TEXT_NODE:
                             $value->addText($str);
                             break;
@@ -228,7 +216,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::TEXT_NODE_FUNC:
-                            if(FSM::TEXT_NODE !== $state){
+                            if (FSM::TEXT_NODE !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -245,11 +233,9 @@ class Emmet
                             $node->setValue($value);
                             $value = new Value($this->_data);
                             break;
-                        
-                        
                         case FSM::MULTI:
                             $value->addText($str);
-                            if(7 !== $state_num){
+                            if (7 !== $state_num) {
                                 $node->setMultiplication($value);
                                 $value = new Value($this->_data);
                             }
@@ -258,7 +244,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::MULTI_FUNC:
-                            if(FSM::MULTI !== $state){
+                            if (FSM::MULTI !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -270,10 +256,8 @@ class Emmet
                         case FSM::MULTI_ARG_VAR:
                             $value->addArgument($str, Value::VARIABLE);
                             break;
-                        
-                        
                         case FSM::HTML:
-                            if(!$value->isEmpty()){
+                            if (!$value->isEmpty()) {
                                 $node->setType(Node::HTML);
                                 $node->setValue($value);
                                 $value = new Value($this->_data);
@@ -283,7 +267,7 @@ class Emmet
                             $value->addVariable($str);
                             break;
                         case FSM::HTML_FUNC:
-                            if(FSM::HTML !== $state){
+                            if (FSM::HTML !== $state) {
                                 $value->addFunction($str);
                             }
                             break;
@@ -299,6 +283,7 @@ class Emmet
                             throw new \Exception('Unhandled Finite State Machine State. ' . $this->getCheckTheDocumentation($i));
                             break;
                     }
+                    // @todo перевести этот if на остаток от деления
                     if((
                             FSM::OPERATOR === $state || FSM::TAG === $state || FSM::HTML_ARG_TXT === $state ||
                             FSM::TEXT_ARG_TXT === $state || FSM::TEXT_NODE_ARG_TXT === $state ||
@@ -308,6 +293,7 @@ class Emmet
                     ){
                         $str = $symbol;
                     } else {
+                        // @todo обработать FSM::ERROR
                         $str = '';
                     }
                 } else {
