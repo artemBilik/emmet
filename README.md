@@ -79,6 +79,7 @@ Text node object starts from '{'. And can has multiplication
 {text}+{another text}*3
 ```
 Text node cann't has any child. So you cann't use '>' operation to the text node object. 
+
 Html object represent by variable or function. It can has a multiplication.
 ```
 `variable`>%function()%
