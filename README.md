@@ -3,7 +3,7 @@ Emmet implementation for php
 # Installation
 Add 
 ```
-"artem_c/emmet": "dev-master"
+"artem_c/emmet": "1.0.*"
 ```
 to the require section of your composer.json file.
 
