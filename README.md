@@ -1,5 +1,12 @@
-# emmet
-Emmet for php
+# Description
+Emmet implementation for php
+# Installation
+Add 
+```
+"artem_c/emmet": "1.0.*"
+```
+to the require section of your composer.json file.
+
 # Interface
 ````
 
@@ -49,9 +56,35 @@ echo (new Emmet(
 
 # Detail usage
 
-[operation] [ tag[id][class][attributes][element text node][multiplication] ] | [ html[multiplication] ] | [ text_node[multiplication] ] [operation]
+[operation] [ tag [id] [class] [attributes] [element text node] [multiplication] ] | [ html [multiplication] ] | [ text_node [multiplication] ] [operation]
 
 So we have Operations and Tags, Text Nodes and Html elements.
+
+# Overview
+Emmet string consists of objects and operations. Objects represent by tag or text node or html.
+```
+object+object>object(object+object)
+```
+Tag object starts from a tag name
+```
+div>div>p+span
+```
+It can start from any charaсter except '`', '%', '{'.
+Tag node can has id, class, attributes, text and multiplication.
+```
+div#id.class[attr=value]{text}*2+span.class
+```
+Text node object starts from '{'. And can has multiplication
+```
+{text}+{another text}*3
+```
+Text node cann't has any child. So you cann't use '>' operation to the text node object. 
+
+Html object represent by variable or function. It can has a multiplication.
+```
+`variable`>%function()%
+```
+It can has a child object.
 
 # Operations
  
