@@ -9,7 +9,7 @@
             "email": "artem.bilik@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "1.0",
     "require": {},
     "autoload": {
         "psr-4": { "artem_c\\emmet\\": "vendor/src" }
