@@ -2,7 +2,7 @@
     "name": "artem_c/emmet",
     "description": "emmet implementation for php",
     "type": "library",
-    "license": "proprietary",
+    "license": "free",
     "authors": [
         {
             "name": "Artem Bilik",
