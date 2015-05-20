@@ -12,6 +12,6 @@
     "minimum-stability": "1.0",
     "require": {},
     "autoload": {
-        "psr-4": { "artem_c\\emmet\\": "vendor/src" }
+        "psr-4": { "artem_c\\emmet\\Emmet": "vendor/src/Emmet.php" }
     }
 }
