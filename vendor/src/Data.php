@@ -4,6 +4,7 @@ namespace artem_c\emmet;
 class Data
 {
 
+
     const VALUE = '{{value}}';
 
     private $_data = [];
