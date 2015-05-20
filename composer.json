@@ -9,6 +9,7 @@
             "email": "artem.bilik@gmail.com"
         }
     ],
+    "minimum-stability" : "dev",
     "require": {},
     "autoload": {
         "psr-4": { "artem_c\\emmet\\Emmet\\": "vendor/src/Emmet.php" }
