@@ -3,7 +3,7 @@ Emmet implementation for php
 # Installation
 Add 
 ```
-"artem_c/emmet": "1.0.*"
+"artem_c/emmet": "~1.0"
 ```
 to the require section of your composer.json file.
 
@@ -60,7 +60,7 @@ echo (new Emmet(
 
 So we have Operations and Tags, Text Nodes and Html elements.
 
-# Overview
+## Overview
 Emmet string consists of objects and operations. Objects represent by tag or text node or html.
 ```
 object+object>object(object+object)
@@ -86,7 +86,7 @@ Html object represent by variable or function. It can has a multiplication.
 ```
 It can has a child object.
 
-# Operations
+## Operations
  
 ( ) ^ > +
  
@@ -115,7 +115,7 @@ Let's see.
 'div>(div>p)^+div' === '<div><div><p></p></div></div>' . '<div></div>'
 ```
 
-# Tags
+## Tags
 
 To create a tag you can use any character.
 ```
@@ -143,7 +143,7 @@ If you need more than one elements use multiplication by "*"
 'p*2' === '<p></p><p></p>'
 ```
 
-# Text Node
+## Text Node
 
 You can create a text node without any tag.
 And use it like other element with "+" operation. But you cann't add a child element to text node.
@@ -152,7 +152,7 @@ And use it like other element with "+" operation. But you cann't add a child ele
 'p+{ some text }*2' === '<p></p> some text  some text '
 ```
 
-# Variables
+## Variables
 
 You can use a variables like a value of your id, classes, text nodes, or multiplication in your string with " ` ".
 
@@ -181,7 +181,7 @@ echo (new Emmet('article{`object.title`}'))->create(['object' => new Object(])])
 
 ```
 
-# Functions
+## Functions
 
 You can use a function in your emmet string.
 At first you must add a function.
@@ -218,7 +218,7 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  echo (new Emmet('div>header{%infoHeader()%}+section{some info}'))-create() === '<div><header>Information header</header><section>some info</section></div>'
  ```
  
- # Combine value
+ ## Combine value
  
  You can combine value of your tag or id or class etc...
  With strings variables and functions.
@@ -227,7 +227,7 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  echo (new Emmet('p#identifier_`$`{the value of node is %getValue(`value[$]`)%, the number of node is `$`}*%count(`value`)%'))->create(['value' => [0,10,20,30,40,50]]) === '<p id="identifier_0">the value of node is 0, the number of node is 0 </p>...<p id="identifier_5">the value of node is 50, the number of node is 5</p>'
  ```
  
-# HTML Node
+## HTML Node
 
 HTML it is a Node of your html tree, and the value of this node is variable or function.
 You can add the value of the html node inside tag or another html node or sibling it.
