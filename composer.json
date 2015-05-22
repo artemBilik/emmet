@@ -12,6 +12,6 @@
     "minimum-stability" : "dev",
     "require": {},
     "autoload": {
-        "psr-4": { "artem_c\\emmet\\": "vendor/src/" }
+        "psr-4": { "artem_c\\emmet\\": "src/" }
     }
 }
