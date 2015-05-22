@@ -1,6 +1,7 @@
 {
     "name": "artem_c/emmet",
     "description": "emmet implementation for php",
+    "keywords": ["emmet", "php", "html"],
     "type": "library",
     "license": "free",
     "authors": [
