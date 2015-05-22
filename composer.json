@@ -12,6 +12,6 @@
     "minimum-stability" : "dev",
     "require": {},
     "autoload": {
-        "files": ["src/Emmet.php"]
+        "classmap": ["src/", "Emmet.php"]
     }
 }
