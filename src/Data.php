@@ -9,7 +9,25 @@ class Data
 
     private $_data = [];
 
-    private static $_functions = [];
+    private static $_functions = [
+        'count' => function($array_to_count, $mode = \COUNT_NORMAL){
+            return count($array_to_count, $mode);
+        },
+        'concat' => function(){
+            $string = '';
+            foreach(func_get_args() as $arg){
+                $string .= $arg;
+            }
+            return $string;
+        },
+        'select' => function($name, $selected, array $data, array $html_options = []) {
+            $options = '';
+            foreach($data as $key => $option){
+                $options .= Node::createTag('option', $option, ['value' => $key] + (($key == $selected) ? ['selected' => 'selected'] : []);
+            }
+            return Node::createTag('select', $options, $html_options);
+        }
+    ];
 
     /**
      * @param array $data
