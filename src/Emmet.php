@@ -75,7 +75,7 @@ class Emmet
                 if (FSM::ERROR === $fsm->getState()) {
                     $this->throwException('There was an error in your Emmet string. ' . $this->getCheckTheDocumentation($i));
                 }
-
+                // @todo попробовать вернуть результат массивом
                 $fsm->setState($symbol);
 
                 if ($fsm->isStateChanged()) {
@@ -299,6 +299,7 @@ class Emmet
                             throw new \Exception('Unhandled Finite State Machine State. ' . $this->getCheckTheDocumentation($i));
                             break;
                     }
+                    // @todo сравнить по скорости со substr
                     if((
                             FSM::OPERATOR === $state || FSM::TAG === $state || FSM::HTML_ARG_TXT === $state ||
                             FSM::TEXT_ARG_TXT === $state || FSM::TEXT_NODE_ARG_TXT === $state ||

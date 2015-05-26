@@ -66,6 +66,7 @@ class Value
      * @return bool
      * @throws \Exception
      */
+    // @todo отрефакторить тут хуйня какая то с первым ифом
     public function addArgument($arg_value, $arg_type)
     {
 

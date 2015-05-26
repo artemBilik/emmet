@@ -295,16 +295,16 @@ class Node extends Tree
             if(1 < $multiplication) {
                 $this->setNumber($i);
             }
-            $tag = $this->get('tag');
+            $tag = $this->get('tag'); // @todo move out of for
             if(false !== strpos(self::$_self_closing_tags, '%'.$tag.'%')){ // @todo add ' ' $tag throw tests
                 $result .= $this->selfClosingElement($tag);
             } else {
-                $value = '';
+                $value = ''; // @todo remove value
                 $first_child = $this->getFirstChild();
                 if($first_child){
                     $value .= $first_child->getHtml($this->_number);
                 }
-                $html = $this->closingElement($tag, $value);
+                $html = $this->closingElement($tag, $value); // @todo remove $html
                 $result .= $html;
             }
         }
@@ -333,7 +333,7 @@ class Node extends Tree
                 $value .= $first_child->getHtml($this->_number);
             }
 
-            $html = $this->get('value', $value);
+            $html = $this->get('value', $value); //@todo remove html
             $result .= $html;
 
         }
@@ -425,7 +425,6 @@ class Node extends Tree
 
     private function get($var, $value = null)
     {
-
 
         $var = '_'.$var;
         if($this->$var instanceof Value){
