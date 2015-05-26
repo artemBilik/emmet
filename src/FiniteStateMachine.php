@@ -1237,6 +1237,7 @@ class FiniteStateMachine
     {
 
         $this->_prev_state       = $this->_state;
+        // @todo проверить на лишнее проверку на SKIP
         $this->_is_state_changed = (self::SKIP === $state) ? false : true;
         $this->_state            = $state;
 

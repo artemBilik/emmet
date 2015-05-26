@@ -21,6 +21,7 @@ class PolishNotation
                 array_unshift($this->_stack, '(');
                 return true;
             case ')':
+                //@todo отрефакторить
                 unset($operator);
                 $up = -2;
                 do{
@@ -126,6 +127,7 @@ class PolishNotation
                     if($child instanceof Node){
                         $parent = $child->getParent();
                         if(null !== $parent){
+                            // @todo зачем здесь getParent()
                             array_unshift($this->_stack, $child->getParent());
                         } else {
                             if(!$child->isRoot()){
