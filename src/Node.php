@@ -297,14 +297,14 @@ class Node extends Tree
             }
             $tag = $this->get('tag'); // @todo move out of for
             if(false !== strpos(self::$_self_closing_tags, '%'.$tag.'%')){ // @todo add ' ' $tag throw tests
-                $result .= $this->selfClosingElement($tag);
+                $result .= self::selfClosingElement($tag, $this->getAttributes());
             } else {
                 $value = ''; // @todo remove value
                 $first_child = $this->getFirstChild();
                 if($first_child){
                     $value .= $first_child->getHtml($this->_number);
                 }
-                $html = $this->closingElement($tag, $value); // @todo remove $html
+                $html = self::closingElement($tag, $this->getAttributes(), $value); // @todo remove $html
                 $result .= $html;
             }
         }
@@ -374,19 +374,19 @@ class Node extends Tree
 
     }
 
-    private function closingElement($tag, $value)
-    {
+//    private function closingElement($tag, $value)
+//    {
+//
+//        return "<" . $tag . $this->getAttributes() . ">" . $value . "</" . $tag . ">";
+//
+//    }
 
-        return "<" . $tag . $this->getAttributes() . ">" . $value . "</" . $tag . ">";
-
-    }
-
-    private function selfClosingElement($tag)
-    {
-
-        return "<" . $tag . $this->getAttributes() . " />";
-
-    }
+//    private function selfClosingElement($tag)
+//    {
+//
+//        return "<" . $tag . $this->getAttributes() . " />";
+//
+//    }
 
     private function getAttributes()
     {
@@ -415,11 +415,12 @@ class Node extends Tree
             }
         }
 
-        $attr_str = '';
-        foreach($attributes as $key => $attr){
-            $attr_str .= ' ' . $key . '="' . $attr . '"';
-        }
-        return $attr_str;
+        return $attributes;
+//        $attr_str = '';
+//        foreach($attributes as $key => $attr){
+//            $attr_str .= ' ' . $key . '="' . $attr . '"';
+//        }
+//        return $attr_str;
 
     }
 
@@ -437,6 +438,27 @@ class Node extends Tree
         } else {
             return $this->$var;
         }
+
+    }
+
+    public static function closingElement($tag, array $attributes = [], $value = '')
+    {
+
+        $attr_str = '';
+        foreach($attributes as $key => $attr){
+            $attr_str .= ' ' . $key . '="' . $attr . '"';
+        }
+        return "<" . $tag . $attr_str . ">" . $value . "</" . $tag . ">";
+
+    }
+    public static function selfClosingElement($tag, array $attributes = [])
+    {
+
+        $attr_str = '';
+        foreach($attributes as $key => $attr){
+            $attr_str .= ' ' . $key . '="' . $attr . '"';
+        }
+        return "<" . $tag . $attr_str . " />";
 
     }
 
