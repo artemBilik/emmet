@@ -30,7 +30,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         ]);
 
         Data::setFunctions([
-            'select' => function($name, $selected, $values){
+            'select_for_test' => function($name, $selected, $values){
                 $value = '';
                 foreach($values as $key => $item){
                     $value .= '<option value="' . $key . '"' . (($key === $selected) ? ' selected>' : '>') . $item . '</option>';
@@ -61,7 +61,21 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($get === $expected);
 
     }
+    public function testDefaultFunc()
+    {
 
+        $data = new Data();
+
+        $concat = $data->func('concat', ['My', ' name', ' is', ' Artem!']);
+        $this->assertEquals($concat, 'My name is Artem!');
+
+        $test_array = [1,2,3,4,5];
+        $this->assertEquals(count($test_array), $data->func('count', [$test_array]));
+
+        $select = '<select name="Test[test]" class="class1 class2"><option value="0" selected="selected">null</option><option value="1">one</option><option value="2">two</option></select>';
+        //file_put_contents('select', $data->func('select', ['Test[test]', 0, ['null', 'one', 'two'], ['class' => 'class1 class2']]));
+        $this->assertEquals($select, $data->func('select', ['Test[test]', 0, ['null', 'one', 'two'], ['class' => 'class1 class2']]));
+    }
 
 
     public function funcProvider()
@@ -70,7 +84,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->setData();
 
         return [
-            [$this->_data->func('select', [
+            [$this->_data->func('select_for_test', [
                 ['value' => 'array_assoc[object].name', 'type' => Value::VARIABLE,],
                 ['type' => Value::TXT, 'value' => 2],
                 ['type' => Value::VARIABLE, 'value' => 'array_assoc[object].data'],

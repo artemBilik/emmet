@@ -1,6 +1,7 @@
 <?php
 namespace artem_c\emmet;
 
+Data::setDefaultFunctions();
 class Data
 {
 
@@ -9,25 +10,7 @@ class Data
 
     private $_data = [];
 
-    private static $_functions = [
-        'count' => function($array_to_count, $mode = \COUNT_NORMAL){
-            return count($array_to_count, $mode);
-        },
-        'concat' => function(){
-            $string = '';
-            foreach(func_get_args() as $arg){
-                $string .= $arg;
-            }
-            return $string;
-        },
-        'select' => function($name, $selected, array $data, array $html_options = []) {
-            $options = '';
-            foreach($data as $key => $option){
-                $options .= Node::createTag('option', $option, ['value' => $key] + (($key == $selected) ? ['selected' => 'selected'] : []);
-            }
-            return Node::createTag('select', $options, $html_options);
-        }
-    ];
+    private static $_functions = [];
 
     /**
      * @param array $data
@@ -130,15 +113,20 @@ class Data
             } elseif(self::$_functions[$name] instanceof \Closure){
                 $args_for_call = [];
                 foreach($args as $arg){
-                    if(Value::VARIABLE === $arg['type']){
+                    if(is_array($arg) && array_key_exists('type', $arg) && Value::VARIABLE === $arg['type']){
                         $args_for_call[] = $this->get($arg['value'], $number, null);
                     } else {
-                        $args_for_call[] = $arg['value'];
+                        if(is_array($arg) && array_key_exists('value', $arg)){
+                            $args_for_call[] = $arg['value'];
+                        } else {
+                            $args_for_call[] = $arg;
+                        }
                     }
                 }
                 if($value){
                     $args_for_call[] = $value;
                 }
+
                 return call_user_func_array(self::$_functions[$name], $args_for_call);
             } else {
                 $this->throwException('Function "' . $name .'" must be a callable or a string.');
@@ -156,6 +144,30 @@ class Data
     {
 
         self::$_functions = array_merge(self::$_functions, $functions);
+
+    }
+    public static function setDefaultFunctions()
+    {
+
+        self::setFunctions([
+            'count' => function($array_to_count, $mode = \COUNT_NORMAL){
+                return count($array_to_count, $mode);
+            },
+            'concat' => function(){
+                $string = '';
+                foreach(func_get_args() as $arg){
+                    $string .= $arg;
+                }
+                return $string;
+            },
+            'select' => function($name, $selected, array $data, array $html_options = []) {
+                $options = '';
+                foreach($data as $key => $option){
+                    $options .= Node::closingElement('option', ['value' => $key] + (($key == $selected) ? ['selected' => ''] : []), $option);
+                }
+                return Node::closingElement('select', (['name' => $name] + $html_options), $options);
+            }
+        ]);
 
     }
 
