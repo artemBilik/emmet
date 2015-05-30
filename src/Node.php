@@ -291,21 +291,20 @@ class Node extends Tree
 
         $result = '';
         $multiplication = $this->get('multiplication');
+        $tag = $this->get('tag');
         for($i = 0; $i < $multiplication; $i++){
             if(1 < $multiplication) {
                 $this->setNumber($i);
             }
-            $tag = $this->get('tag'); // @todo move out of for
-            if(false !== strpos(self::$_self_closing_tags, '%'.$tag.'%')){ // @todo add ' ' $tag throw tests
+            if(false !== strpos(self::$_self_closing_tags, '%'.$tag.'%')){
                 $result .= self::selfClosingElement($tag, $this->getAttributes());
             } else {
-                $value = ''; // @todo remove value
                 $first_child = $this->getFirstChild();
                 if($first_child){
-                    $value .= $first_child->getHtml($this->_number);
+                    $result .= self::closingElement($tag, $this->getAttributes(), $first_child->getHtml($this->_number));;
+                } else {
+                    $result .= self::closingElement($tag, $this->getAttributes(), '');
                 }
-                $html = self::closingElement($tag, $this->getAttributes(), $value); // @todo remove $html
-                $result .= $html;
             }
         }
 
@@ -326,16 +325,13 @@ class Node extends Tree
             if(1 < $multiplication){
                 $this->setNumber($i);
             }
-            $value = '';
             $first_child = $this->getFirstChild();
             if($first_child){
                 $first_child->setNumber($i);
-                $value .= $first_child->getHtml($this->_number);
+                $result .= $this->get('value', $first_child->getHtml($this->_number));
+            } else {
+                $result .= $this->get('value', '');
             }
-
-            $html = $this->get('value', $value); //@todo remove html
-            $result .= $html;
-
         }
         $right_sibling = $this->getRightSibling();
         if($right_sibling){
@@ -416,11 +412,6 @@ class Node extends Tree
         }
 
         return $attributes;
-//        $attr_str = '';
-//        foreach($attributes as $key => $attr){
-//            $attr_str .= ' ' . $key . '="' . $attr . '"';
-//        }
-//        return $attr_str;
 
     }
 
