@@ -216,7 +216,27 @@ echo (new Emmet('p{%funcName(some text)%}'))->create() === '<p> some text </p>'
  ```
  Emmet::addFunctions(['infoHeader' => 'Information header'])
  echo (new Emmet('div>header{%infoHeader()%}+section{some info}'))-create() === '<div><header>Information header</header><section>some info</section></div>'
+
  ```
+ 
+ You can use a default functions. 
+
+```
+  integer count( mixed ) // the same as 'count()' in php
+```
+```
+  string concat (string, string, ...) // concatinate the arguments
+  (new Emmet('ul>li{`cities[$]`}*%count(`cities`)%)')->create(['cities' => array('1,2,3)])
+```
+```
+  strinf select($name, $selected, array $data, array $html_options = []) // creates Select HTML Element
+```
+
+For generating HTML code inside your function you can use the static methods of a Node class.
+```
+  Node::selfClosingElement($tag, array $attributes = []);
+  Node::closingElement($tag, array $attributes = [], $value = '')
+```
  
  ## Combine value
  
