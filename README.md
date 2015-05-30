@@ -177,7 +177,7 @@ echo (new Emmet(
 You can use an object in your variable by '.'
 ```
 
-echo (new Emmet('article{`object.title`}'))->create(['object' => new Object(])]);
+echo (new Emmet('article{`object.title`}'))->create(['object' => new Object()]);
 
 ```
 
