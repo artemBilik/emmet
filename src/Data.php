@@ -163,7 +163,7 @@ class Data
             'select' => function($name, $selected, array $data, array $html_options = []) {
                 $options = '';
                 foreach($data as $key => $option){
-                    $options .= Node::closingElement('option', ['value' => $key] + (($key == $selected) ? ['selected' => ''] : []), $option);
+                    $options .= Node::closingElement('option', ['value' => $key] + (($key == $selected) ? ['selected' => 'selected'] : []), $option);
                 }
                 return Node::closingElement('select', (['name' => $name] + $html_options), $options);
             }

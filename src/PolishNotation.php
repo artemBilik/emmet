@@ -18,7 +18,7 @@ class PolishNotation
 
         switch($operator){
             case '(':
-                array_unshift($this->_stack, '(');
+                array_push($this->_stack, '(');
                 return true;
             case ')':
                 //@todo отрефакторить
@@ -28,7 +28,7 @@ class PolishNotation
                     if(isset($operator)){
                         $this->_output[] = $operator;
                     }
-                    $operator = array_shift($this->_stack);
+                    $operator = array_pop($this->_stack);
                     if('>' === $operator){
                         $up++;
                     }
@@ -42,14 +42,14 @@ class PolishNotation
                 }
                 return true;
             case '+':
-                array_unshift($this->_stack, '+');
+                array_push($this->_stack, '+');
                 return true;
             case '>':
-                array_unshift($this->_stack, '>');
+                array_push($this->_stack, '>');
                 return true;
             case '^':
                 do{
-                    $operator = array_shift($this->_stack);
+                    $operator = array_pop($this->_stack);
                     if(empty($this->_stack)){
                         $this->throwException('The "^" operator is excess.');
                     }
@@ -79,7 +79,7 @@ class PolishNotation
     {
 
         while(true){
-            $operator = array_shift($this->_stack);
+            $operator = array_pop($this->_stack);
             if(null === $operator){
                 break;
             } elseif('(' === $operator){
@@ -102,36 +102,36 @@ class PolishNotation
         while(!empty($this->_output)){
             $el = array_shift($this->_output);
             if($el instanceof Node){
-                array_unshift($this->_stack, $el);
+                array_push($this->_stack, $el);
             } else {
                 if('>' === $el){
-                    $child = array_shift($this->_stack);
-                    $parent = array_shift($this->_stack);
+                    $child = array_pop($this->_stack);
+                    $parent = array_pop($this->_stack);
                     if($parent instanceof Node && $child instanceof Node){
                         $child->addTo($parent);
-                        array_unshift($this->_stack, $parent);
+                        array_push($this->_stack, $parent);
                     } else {
                         $this->throwException('the number of operands less than operations.');
                     }
                 } elseif('+' === $el){
-                    $right = array_shift($this->_stack);
-                    $left = array_shift($this->_stack);
+                    $right = array_pop($this->_stack);
+                    $left = array_pop($this->_stack);
                     if($left instanceof Node && $right instanceof Node){
                         $left->addSibling($right);
-                        array_unshift($this->_stack, $left);
+                        array_push($this->_stack, $left);
                     } else {
                         $this->throwException('the number of operands less than operations.');
                     }
                 } elseif('^' === $el){
-                    $child = array_shift($this->_stack);
+                    $child = array_pop($this->_stack);
                     if($child instanceof Node){
                         $parent = $child->getParent();
                         if(null !== $parent){
                             // @todo зачем здесь getParent()
-                            array_unshift($this->_stack, $child->getParent());
+                            array_push($this->_stack, $child->getParent());
                         } else {
                             if(!$child->isRoot()){
-                                array_unshift($this->_stack, $child);
+                                array_push($this->_stack, $child);
                             } else {
                                 $this->throwException('You are out of the tree. Check "^" operator.');
                             }
@@ -145,7 +145,7 @@ class PolishNotation
             }
         }
 
-        $res = array_shift($this->_stack);
+        $res = array_pop($this->_stack);
         while($res->hasParent()){
             $res = $res->getParent();
         }
