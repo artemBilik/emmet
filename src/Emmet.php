@@ -59,12 +59,12 @@ class Emmet
                     $symbol = $emmet_string[$i];
                 }
 
-                if ('/' === $symbol) {
+                if ('\\' === $symbol) {
                     if ($i === $length) {
                         $i++;
                         continue;
                     } else {
-                        $str .= $emmet_string[++$i];
+                        $str .= $emmet_string[$i];
                         ++$i;
                         continue;
                     }
