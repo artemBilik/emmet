@@ -277,3 +277,12 @@ echo (new Emmet('div>%func(first, `second`)%>`second`+a'))->create(['second' => 
 
 ```
 
+## Screening
+
+You cat use / for screening. When you need one of the special chars inside your text you should use / before symbol.
+```
+[data-value=[]]  // this will generate an error 
+// but
+[data-value=/[/]] // generate an html
+data-value="[]"
+```
