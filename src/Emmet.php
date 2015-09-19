@@ -146,7 +146,7 @@ class Emmet
                         
                         
                         case FSM::CLASS_NAME:
-                            $value->addText($str);
+                            $value->addText(($value->isEmpty() ? '' : ' ') . $str);
                             if(3 !== $state_num){
                                 $node->addClass($value);
                                 $value = new Value($this->_data);
