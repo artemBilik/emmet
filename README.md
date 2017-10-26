@@ -8,19 +8,19 @@ Add
 to the require section of your composer.json file.
 
 # Interface
-````
+```
 
 Emmet::__construct( string emmet_string );
 Emmet::create(array data);
 Emmet::addFunctions(array functions);
 
-````
+```
 
 # Global Usage
 
 
 Simple Usage
-``````````
+```
   (new Emmet('div>p>span+a>img[src=img.jpg]'))->create();
 ```
    OR
