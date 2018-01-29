@@ -3,7 +3,7 @@
     "description": "emmet implementation for php",
     "keywords": ["emmet", "php", "html"],
     "type": "library",
-    "license": "UNLICENSED",
+    "license": "Unlicense",
     "authors": [
         {
             "name": "Artem Bilik",
