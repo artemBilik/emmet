@@ -45,7 +45,7 @@ class Data
         $state = '[';
         $value = '';
         for($i = 0, $length = strlen($variable); $i < $length; ++$i){
-            $symbol = $variable{$i};
+            $symbol = $variable[$i];
             if('$' === $symbol){
                 $symbol = $number;
             }
@@ -59,8 +59,8 @@ class Data
                             $this->throwException('Cann\'t find the variable "' . substr($variable, 0, strlen($variable) - 1) . '".');
                         }
                     } elseif('{' === $state){
-                        if(isset($memory{$value})){
-                            $memory = $memory{$value};
+                        if(isset($memory[$value])){
+                            $memory = $memory[$value];
                         } else {
                             $this->throwException('Cann\'t find the variable "' . substr($variable, 0, strlen($variable) - 1) . '".');
                         }
